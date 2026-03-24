@@ -1,2 +1,2 @@
 # VECTOR
-Active agent workspace product that supersedes CODEX in the SYNAPSIS suite.
+Active agent workspace product that supersedes CODEX in the SYNAPSE suite.
