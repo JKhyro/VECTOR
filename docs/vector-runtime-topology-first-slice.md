@@ -70,7 +70,10 @@ It is intentionally bounded. It does not describe every future subsystem. It def
 - The next concrete retrieved-context bundle and active-management handoff contract is now also defined as a `DEVBASE`-owned VECTOR memory operation.
 - That contract treats DEVBASE memory citations as governed input, assembles a retrieved-context bundle, and defines the handoff payload shape used by VECTOR active-management follow-on work.
 - `FLUXBASE`, `CODEBASE`, and `CHATBASE` remain reference lanes only for this handoff contract, not the authority for bundle assembly or management handoff truth.
+- The next concrete active-management decision-envelope and retrieval-action contract is now also defined as a `DEVBASE`-owned VECTOR memory operation.
+- That contract treats the DEVBASE handoff payload as governed input, defines the active-management decision envelope, and defines the retrieval-action shape used by downstream VECTOR management and operator-review flows.
+- `FLUXBASE`, `CODEBASE`, and `CHATBASE` remain reference lanes only for this decision/action contract, not the authority for decision assembly or retrieval-action truth.
 
 ## Immediate next slice
 
-- Move from DEVBASE context-bundle and active-management handoff contract definition into bounded live selection, citation, and handoff execution readiness without collapsing the named lane boundaries.
+- Move from DEVBASE decision-envelope and retrieval-action contract definition into bounded live selection, citation, handoff, and decision execution readiness without collapsing the named lane boundaries.
