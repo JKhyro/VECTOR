@@ -62,6 +62,12 @@ It is intentionally bounded. It does not describe every future subsystem. It def
 - Those seams should keep reporting `FLUXBASE`, `DEVBASE`, `CODEBASE`, and `CHATBASE` explicitly rather than collapsing state back into one local app store.
 - Upstream `openai/codex` session and retrieval behavior can still be assimilated, but the authoritative lane for forward VECTOR memory remains `DEVBASE`, not SQLite.
 
+## Completed next slice
+
+- The first concrete retrieval-selection and memory-citation contract is now defined as a `DEVBASE`-owned VECTOR memory operation.
+- That contract treats pgvector hits as selection input, authoritative Postgres records as selection truth, and governed memory citations as the downstream shape consumed by RAG, recursion, and operator preview surfaces.
+- `FLUXBASE`, `CODEBASE`, and `CHATBASE` remain cross-lane reference surfaces only for that contract, not the primary authority for memory selection or citation materialization.
+
 ## Immediate next slice
 
-- Define the first concrete retrieval-selection and memory-citation contract that reads as a `DEVBASE`-owned VECTOR memory operation while keeping `FLUXBASE`, `CODEBASE`, and `CHATBASE` boundaries intact.
+- Move from DEVBASE retrieval-selection and memory-citation contract definition into bounded live selection/citation execution readiness without collapsing the named lane boundaries.
