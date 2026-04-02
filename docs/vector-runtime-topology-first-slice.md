@@ -91,7 +91,10 @@ It is intentionally bounded. It does not describe every future subsystem. It def
 - The next concrete post-approval execution-plan and dispatch contract is now also defined as a `DEVBASE`-owned VECTOR memory operation.
 - That contract treats the DEVBASE approval-resolution and execution-authority records as governed input, defines the execution-plan shape, and defines the dispatch envelope used by downstream VECTOR runnable-work and operator-review flow.
 - `FLUXBASE`, `CODEBASE`, and `CHATBASE` remain reference lanes only for this post-approval execution-plan/dispatch contract, not the authority for plan assembly or dispatch truth.
+- The next concrete post-dispatch observation and feedback contract is now also defined as a `DEVBASE`-owned VECTOR memory operation.
+- That contract treats the DEVBASE execution plan and dispatch envelope as governed input, defines the observation shape, and defines the feedback record used by downstream VECTOR execution-review and operator-review flow.
+- `FLUXBASE`, `CODEBASE`, and `CHATBASE` remain reference lanes only for this post-dispatch observation/feedback contract, not the authority for observation assembly or feedback truth.
 
 ## Immediate next slice
 
-- Move from DEVBASE decision-envelope, execution-outcome, state-transition, recovery-override, escalation, approval, approval-resolution, and post-approval dispatch contract definition into bounded live selection, citation, handoff, decision execution, state-transition execution, recovery execution, delegation execution, approval execution, approval-resolution execution, and dispatch execution readiness without collapsing the named lane boundaries.
+- Move from DEVBASE decision-envelope, execution-outcome, state-transition, recovery-override, escalation, approval, approval-resolution, post-approval dispatch, and post-dispatch feedback contract definition into bounded live selection, citation, handoff, decision execution, state-transition execution, recovery execution, delegation execution, approval execution, approval-resolution execution, dispatch execution, and feedback execution readiness without collapsing the named lane boundaries.
