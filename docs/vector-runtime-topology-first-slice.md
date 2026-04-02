@@ -88,7 +88,10 @@ It is intentionally bounded. It does not describe every future subsystem. It def
 - The next concrete approval-resolution and execution-authority contract is now also defined as a `DEVBASE`-owned VECTOR memory operation.
 - That contract treats the DEVBASE approval-gate and operator-confirmation records as governed input, defines the approval-resolution shape, and defines the execution-authority record used by downstream VECTOR execution and operator-review flow.
 - `FLUXBASE`, `CODEBASE`, and `CHATBASE` remain reference lanes only for this approval-resolution/execution-authority contract, not the authority for resolution logic or execution-authority truth.
+- The next concrete post-approval execution-plan and dispatch contract is now also defined as a `DEVBASE`-owned VECTOR memory operation.
+- That contract treats the DEVBASE approval-resolution and execution-authority records as governed input, defines the execution-plan shape, and defines the dispatch envelope used by downstream VECTOR runnable-work and operator-review flow.
+- `FLUXBASE`, `CODEBASE`, and `CHATBASE` remain reference lanes only for this post-approval execution-plan/dispatch contract, not the authority for plan assembly or dispatch truth.
 
 ## Immediate next slice
 
-- Move from DEVBASE decision-envelope, execution-outcome, state-transition, recovery-override, escalation, approval, and approval-resolution contract definition into bounded live selection, citation, handoff, decision execution, state-transition execution, recovery execution, delegation execution, approval execution, and approval-resolution execution readiness without collapsing the named lane boundaries.
+- Move from DEVBASE decision-envelope, execution-outcome, state-transition, recovery-override, escalation, approval, approval-resolution, and post-approval dispatch contract definition into bounded live selection, citation, handoff, decision execution, state-transition execution, recovery execution, delegation execution, approval execution, approval-resolution execution, and dispatch execution readiness without collapsing the named lane boundaries.
