@@ -29,7 +29,7 @@ VECTOR is the forward workspace product direction being cloned from useful Codex
 
 The first concrete topology slice now lives in [`docs/vector-runtime-topology-first-slice.md`](docs/vector-runtime-topology-first-slice.md).
 
-That document now also records the next completed DEVBASE memory step: retrieval selection and memory-citation shape are treated as `DEVBASE`-owned contracts before RAG and recursion fan back out into downstream runtime paths.
+That document now also records the completed DEVBASE memory steps: retrieval selection and memory-citation shape are treated as `DEVBASE`-owned contracts, and the next retrieved-context bundle plus active-management handoff shape is likewise `DEVBASE`-owned before downstream runtime paths consume it.
 
 That slice makes the first ownership map explicit:
 

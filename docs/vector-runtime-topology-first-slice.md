@@ -67,7 +67,10 @@ It is intentionally bounded. It does not describe every future subsystem. It def
 - The first concrete retrieval-selection and memory-citation contract is now defined as a `DEVBASE`-owned VECTOR memory operation.
 - That contract treats pgvector hits as selection input, authoritative Postgres records as selection truth, and governed memory citations as the downstream shape consumed by RAG, recursion, and operator preview surfaces.
 - `FLUXBASE`, `CODEBASE`, and `CHATBASE` remain cross-lane reference surfaces only for that contract, not the primary authority for memory selection or citation materialization.
+- The next concrete retrieved-context bundle and active-management handoff contract is now also defined as a `DEVBASE`-owned VECTOR memory operation.
+- That contract treats DEVBASE memory citations as governed input, assembles a retrieved-context bundle, and defines the handoff payload shape used by VECTOR active-management follow-on work.
+- `FLUXBASE`, `CODEBASE`, and `CHATBASE` remain reference lanes only for this handoff contract, not the authority for bundle assembly or management handoff truth.
 
 ## Immediate next slice
 
-- Move from DEVBASE retrieval-selection and memory-citation contract definition into bounded live selection/citation execution readiness without collapsing the named lane boundaries.
+- Move from DEVBASE context-bundle and active-management handoff contract definition into bounded live selection, citation, and handoff execution readiness without collapsing the named lane boundaries.
