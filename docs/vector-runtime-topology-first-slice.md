@@ -85,7 +85,10 @@ It is intentionally bounded. It does not describe every future subsystem. It def
 - The next concrete approval-gate and operator-confirmation contract is now also defined as a `DEVBASE`-owned VECTOR memory operation.
 - That contract treats the DEVBASE escalation record and delegation envelope as governed input, defines the approval-gate shape, and defines the operator-confirmation record used by downstream VECTOR approval and operator-review flow.
 - `FLUXBASE`, `CODEBASE`, and `CHATBASE` remain reference lanes only for this approval/confirmation contract, not the authority for approval logic or operator-confirmation truth.
+- The next concrete approval-resolution and execution-authority contract is now also defined as a `DEVBASE`-owned VECTOR memory operation.
+- That contract treats the DEVBASE approval-gate and operator-confirmation records as governed input, defines the approval-resolution shape, and defines the execution-authority record used by downstream VECTOR execution and operator-review flow.
+- `FLUXBASE`, `CODEBASE`, and `CHATBASE` remain reference lanes only for this approval-resolution/execution-authority contract, not the authority for resolution logic or execution-authority truth.
 
 ## Immediate next slice
 
-- Move from DEVBASE decision-envelope, execution-outcome, state-transition, recovery-override, escalation, and approval contract definition into bounded live selection, citation, handoff, decision execution, state-transition execution, recovery execution, delegation execution, and approval execution readiness without collapsing the named lane boundaries.
+- Move from DEVBASE decision-envelope, execution-outcome, state-transition, recovery-override, escalation, approval, and approval-resolution contract definition into bounded live selection, citation, handoff, decision execution, state-transition execution, recovery execution, delegation execution, approval execution, and approval-resolution execution readiness without collapsing the named lane boundaries.
