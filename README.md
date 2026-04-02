@@ -25,4 +25,15 @@ VECTOR is the forward workspace product direction being cloned from useful Codex
 - `JKhyro/VECTOR#3` tracks runtime topology for child programs
 - `JKhyro/VECTOR#4` tracks packaging and distribution
 
+## Runtime topology
+
+The first concrete topology slice now lives in [`docs/vector-runtime-topology-first-slice.md`](docs/vector-runtime-topology-first-slice.md).
+
+That slice makes the first ownership map explicit:
+
+- `FLUXBASE` for FLUX/ANVIL VCS and GitHub execution truth
+- `DEVBASE` for VECTOR memory and active management replacing SQLite
+- `CODEBASE` for code/library and FORGE sandbox execution
+- `CHATBASE` for agent and human communications
+
 GitHub Discussions are currently disabled for this repository, so execution truth for now lives in the repo README, issues, and the VECTOR project.
