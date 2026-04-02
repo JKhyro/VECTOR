@@ -79,7 +79,10 @@ It is intentionally bounded. It does not describe every future subsystem. It def
 - The next concrete recovery-override and next-step contract is now also defined as a `DEVBASE`-owned VECTOR memory operation.
 - That contract treats the DEVBASE execution outcome and state-transition record as governed input, defines the recovery-override shape, and defines the next-step record used by downstream VECTOR active-management recovery flow.
 - `FLUXBASE`, `CODEBASE`, and `CHATBASE` remain reference lanes only for this recovery/next-step contract, not the authority for recovery logic or next-step truth.
+- The next concrete escalation and delegation contract is now also defined as a `DEVBASE`-owned VECTOR memory operation.
+- That contract treats the DEVBASE recovery override and next-step record as governed input, defines the escalation record shape, and defines the delegation envelope used by downstream VECTOR active-management escalation flow.
+- `FLUXBASE`, `CODEBASE`, and `CHATBASE` remain reference lanes only for this escalation/delegation contract, not the authority for escalation logic or delegation truth.
 
 ## Immediate next slice
 
-- Move from DEVBASE decision-envelope, execution-outcome, state-transition, and recovery-override contract definition into bounded live selection, citation, handoff, decision execution, state-transition execution, and recovery execution readiness without collapsing the named lane boundaries.
+- Move from DEVBASE decision-envelope, execution-outcome, state-transition, recovery-override, and escalation contract definition into bounded live selection, citation, handoff, decision execution, state-transition execution, recovery execution, and delegation execution readiness without collapsing the named lane boundaries.
