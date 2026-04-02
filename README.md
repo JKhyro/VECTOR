@@ -7,7 +7,8 @@ VECTOR is the forward workspace product direction being cloned from useful Codex
 ## Data plane
 
 - `FLUXBASE` is the VCS and execution-governance lane for `FLUX` and related `ANVIL` work. It holds repository, issue, pull request, discussion, commit, and GitHub project-item state that needs durable operational truth.
-- `DEVBASE` is the active development and memory lane for `VECTOR`. It replaces SQLite for governed persistent memory and is the forward expansion path for VECTOR memory, RAG, recursion, and active management beyond the upstream Codex App scope.
+- `DEVBASE` is the active development and working-memory lane for `VECTOR`. It replaces SQLite for governed persistent memory and is the forward expansion path for VECTOR memory, RAG, recursion, and active management beyond the upstream Codex App scope.
+- `DEVBASE` is also the shared development and administration lane across `VECTOR`, `FORGE`, and `ANVIL` for project/development state that is not primarily ANVIL local-git or GitHub replacement truth.
 - `CODEBASE` stores code, libraries, and the functional code-development and sandbox surfaces used by `FORGE`.
 - `CHATBASE` stores communication state between agents and humans, including Characters such as Symbiotes, Curators, Synths, and other Agents.
 
@@ -17,6 +18,7 @@ VECTOR is the forward workspace product direction being cloned from useful Codex
 - useful upstream `openai/codex` behavior, contracts, and UX can be assimilated aggressively
 - upstream SQLite-shaped persistence is import/reference only where VECTOR now has a governed `DEVBASE` path
 - VCS truth belongs in `FLUXBASE`, code-development truth belongs in `CODEBASE`, and communications belong in `CHATBASE`
+- ANVIL replacement-oriented local-git and GitHub execution truth still belongs in `FLUXBASE` and the corresponding repo/project/issue/PR/discussion surfaces rather than in `DEVBASE`
 
 ## Active tracking
 

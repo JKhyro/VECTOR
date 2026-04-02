@@ -30,7 +30,7 @@ It is intentionally bounded. It does not describe every future subsystem. It def
 
 - Purpose: VECTOR durable memory, retrieval, RAG, recursion, and active workspace management state.
 - Governing database lane: `DEVBASE`.
-- Owns: persistent memory, memory retrieval state, recursive retrieval growth, active management state, and the forward replacement path for SQLite-shaped app memory.
+- Owns: persistent memory, memory retrieval state, recursive retrieval growth, active management state, the forward replacement path for SQLite-shaped app memory, and shared development/administration state across `VECTOR`, `FORGE`, and `ANVIL` where that state is not ANVIL local-git or GitHub replacement truth.
 - Does not own: VCS/GitHub truth, code sandbox truth, or communications as their primary authority.
 
 ### 3. FORGE code-development child lane
@@ -52,6 +52,7 @@ It is intentionally bounded. It does not describe every future subsystem. It def
 - The Native C runtime is the authority that maps an operation to one primary governed lane.
 - Cross-lane work is allowed, but one lane must remain authoritative for the record being created or updated.
 - A retrieval or workspace-management operation that would previously drift into SQLite should now target `DEVBASE`.
+- A shared project/development-management or development/administration operation across `VECTOR`, `FORGE`, and `ANVIL` that is not VCS/GitHub execution truth should also target `DEVBASE`.
 - A repository or GitHub execution operation should target `FLUXBASE`.
 - A code-development or sandbox operation should target `CODEBASE`.
 - A communication operation should target `CHATBASE`.
