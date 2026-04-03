@@ -19,6 +19,8 @@ VECTOR is the forward workspace product direction being cloned from useful Codex
 - upstream SQLite-shaped persistence is import/reference only where VECTOR now has a governed `DEVBASE` path
 - VCS truth belongs in `FLUXBASE`, code-development truth belongs in `CODEBASE`, and communications belong in `CHATBASE`
 - ANVIL replacement-oriented local-git and GitHub execution truth still belongs in `FLUXBASE` and the corresponding repo/project/issue/PR/discussion surfaces rather than in `DEVBASE`
+- the upstream `openai/codex` clone is present as a real reference base, but VECTOR itself is not yet a merged upstream-based runnable product surface
+- the current usable repo lane remains the Codex Workbench Electron prototype while Native C plus Avalonia and upstream-base assimilation continue
 
 ## Active tracking
 
