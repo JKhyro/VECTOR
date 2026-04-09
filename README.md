@@ -37,7 +37,7 @@ VECTOR consumes CORTEX-managed characters and agent components and exposes them 
 - the main VECTOR desktop program now treats the left-side menu and main interaction space as first-class child programs under a Native C-governed contract
 - the Avalonia continuity shell now routes explicitly around those child-program regions instead of keeping the host as a flat diagnostics surface
 - the Avalonia host now renders those two child-program regions directly from the runtime contract instead of leaving them implicit in one generic pane
-- the main interaction child now defaults to a bounded upstream Codex-style conversation-summary, selected-turn detail, tool/payload preview, approval/artifact continuity, thread-read, and turn-lifecycle preview, so useful Codex app interaction behavior is starting to land inside VECTOR without claiming a full upstream-base merge
+- the main interaction child now defaults to a bounded upstream Codex-style conversation-summary, selected-turn detail, tool/payload preview, execution-result and approval-resolution continuity, approval/artifact continuity, thread-read, and turn-lifecycle preview, so useful Codex app interaction behavior is starting to land inside VECTOR without claiming a full upstream-base merge
 
 ## Active tracking
 
