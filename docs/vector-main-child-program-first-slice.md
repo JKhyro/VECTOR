@@ -26,7 +26,7 @@ It is intentionally narrow. It does not try to name every future subsystem. It m
 - Region: main interaction space
 - Purpose: sessions, turns, approvals, artifacts, and runtime interaction
 - Ownership rule: this is the primary landing zone for assimilated Codex App interaction behavior inside VECTOR
-- Current assimilation slice: bounded upstream Codex conversation-summary, turn-selection, thread-read, and turn-lifecycle preview behavior should land here before wider upstream-base merge claims
+- Current assimilation slice: bounded upstream Codex conversation-summary, selected-turn detail, approval/artifact continuity, thread-read, and turn-lifecycle preview behavior should land here before wider upstream-base merge claims
 
 ## Integration rule
 
@@ -49,5 +49,5 @@ These are candidates, not yet first-class runtime programs in the same way as th
 - The current usable repo lane is still the Codex Workbench Electron prototype.
 - The Native C plus Avalonia lane now owns the `vector_main_child_program_contract` that defines the first child-program boundary for VECTOR.
 - The Avalonia host now renders dedicated left-side menu and main interaction program regions from that runtime contract instead of leaving the split implicit in one generic payload pane.
-- The Avalonia host now routes the main interaction region to a bounded upstream Codex-style conversation-summary, turn-selection, and turn-flow preview by default, using the upstream app-server protocol and test shapes as the source contract.
+- The Avalonia host now routes the main interaction region to a bounded upstream Codex-style conversation-summary, selected-turn detail, approval/artifact continuity, and turn-flow preview by default, using the upstream app-server protocol and test shapes as the source contract.
 - This slice is a structure and routing step, not a claim that the upstream `openai/codex` product base is already fully merged into VECTOR.
