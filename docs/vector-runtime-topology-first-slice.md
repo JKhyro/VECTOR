@@ -23,6 +23,7 @@ It is intentionally bounded. It does not describe every future subsystem. It def
 - The first two first-class child programs are `vector-left-menu-program` and `vector-main-interaction-program`.
 - `vector-left-menu-program` owns the left-side menu region for navigation, launching, workspace selection, and thread selection.
 - `vector-main-interaction-program` owns the main interaction space for sessions, turns, approvals, artifacts, and runtime interaction.
+- The current Avalonia continuity shell should route around those two regions explicitly rather than leaving the host as one undifferentiated diagnostics surface.
 - Useful upstream Codex session-turn behavior should land inside `vector-main-interaction-program` instead of taking over the full shell.
 - Candidate follow-on child programs are `vector-context-inspector-program`, `vector-approval-review-program`, `vector-artifact-inspector-program`, and `vector-status-activity-rail-program`.
 - Avalonia hosts those regions, but the Native C runtime remains the authority for the child-program contract and switching rule.

@@ -22,6 +22,7 @@ VECTOR is the forward workspace product direction being cloned from useful Codex
 - the upstream `openai/codex` clone is present as a real reference base, but VECTOR itself is not yet a merged upstream-based runnable product surface
 - the current usable repo lane remains the Codex Workbench Electron prototype while Native C plus Avalonia and upstream-base assimilation continue
 - the main VECTOR desktop program now treats the left-side menu and main interaction space as first-class child programs under a Native C-governed contract
+- the Avalonia continuity shell now routes explicitly around those child-program regions instead of keeping the host as a flat diagnostics surface
 - the Avalonia host now renders those two child-program regions directly from the runtime contract instead of leaving them implicit in one generic pane
 
 ## Active tracking

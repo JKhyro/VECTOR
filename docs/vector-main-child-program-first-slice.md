@@ -32,6 +32,7 @@ It is intentionally narrow. It does not try to name every future subsystem. It m
 - The left-side menu and main interaction space are separable child programs, but they remain governed under the main VECTOR program.
 - The parent shell should be able to switch, refresh, and compose those child programs without redefining their ownership in managed code.
 - The child-program contract should stay queryable from the Native C runtime so the shell and later child programs consume one governing truth.
+- The current Avalonia continuity shell should render the left-side menu as the explicit navigation rail and the main interaction space as the explicit payload/status region so the decomposition is visible in the host itself.
 
 ## Candidate next child programs
 
