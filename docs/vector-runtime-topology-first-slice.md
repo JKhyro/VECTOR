@@ -25,6 +25,7 @@ It is intentionally bounded. It does not describe every future subsystem. It def
 - `vector-main-interaction-program` owns the main interaction space for sessions, turns, approvals, artifacts, and runtime interaction.
 - The current Avalonia continuity shell should route around those two regions explicitly rather than leaving the host as one undifferentiated diagnostics surface.
 - Useful upstream Codex session-turn behavior should land inside `vector-main-interaction-program` instead of taking over the full shell.
+- The current bounded interaction-assimilation slice is an upstream Codex-style conversation-summary, thread-read, and turn-lifecycle preview inside `vector-main-interaction-program`, not a claim that the full upstream base is merged.
 - Candidate follow-on child programs are `vector-context-inspector-program`, `vector-approval-review-program`, `vector-artifact-inspector-program`, and `vector-status-activity-rail-program`.
 - Avalonia hosts those regions, but the Native C runtime remains the authority for the child-program contract and switching rule.
 - The current host seam now renders dedicated left-menu and main-interaction regions from that runtime contract instead of treating the split as an implicit operator convention.
