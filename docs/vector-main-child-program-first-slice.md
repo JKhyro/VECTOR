@@ -46,4 +46,5 @@ These are candidates, not yet first-class runtime programs in the same way as th
 
 - The current usable repo lane is still the Codex Workbench Electron prototype.
 - The Native C plus Avalonia lane now owns the `vector_main_child_program_contract` that defines the first child-program boundary for VECTOR.
+- The Avalonia host now renders dedicated left-side menu and main interaction program regions from that runtime contract instead of leaving the split implicit in one generic payload pane.
 - This slice is a structure and routing step, not a claim that the upstream `openai/codex` product base is already fully merged into VECTOR.

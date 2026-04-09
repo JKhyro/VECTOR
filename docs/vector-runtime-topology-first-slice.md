@@ -26,6 +26,7 @@ It is intentionally bounded. It does not describe every future subsystem. It def
 - Useful upstream Codex session-turn behavior should land inside `vector-main-interaction-program` instead of taking over the full shell.
 - Candidate follow-on child programs are `vector-context-inspector-program`, `vector-approval-review-program`, `vector-artifact-inspector-program`, and `vector-status-activity-rail-program`.
 - Avalonia hosts those regions, but the Native C runtime remains the authority for the child-program contract and switching rule.
+- The current host seam now renders dedicated left-menu and main-interaction regions from that runtime contract instead of treating the split as an implicit operator convention.
 
 ## Child-program ownership
 
