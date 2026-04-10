@@ -69,6 +69,8 @@ cmake --build "$env:LOCALAPPDATA\VECTOR\child-program-runtime-build" --config De
 ctest --test-dir "$env:LOCALAPPDATA\VECTOR\child-program-runtime-build" -C Debug --output-on-failure
 ```
 
+The same build creates `vector_host`, a native command surface for descriptor listing, route checks, and CORTEX host-state assignment previews.
+
 ## Upstream Manifest
 
 Regenerate the local OpenAI Codex component manifest from the cloned source with:

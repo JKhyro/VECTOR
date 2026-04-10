@@ -10,15 +10,26 @@ add_library(vector_child_program_runtime STATIC
   src/child_program_runtime.c
 )
 
+add_executable(vector_host
+  tools/vector_host.c
+)
+
 target_include_directories(vector_child_program_runtime
   PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
+target_link_libraries(vector_host
+  PRIVATE
+    vector_child_program_runtime
+)
+
 if(MSVC)
   target_compile_options(vector_child_program_runtime PRIVATE /W4)
+  target_compile_options(vector_host PRIVATE /W4)
 else()
   target_compile_options(vector_child_program_runtime PRIVATE -Wall -Wextra -Wpedantic)
+  target_compile_options(vector_host PRIVATE -Wall -Wextra -Wpedantic)
 endif()
 
 enable_testing()
@@ -47,3 +58,25 @@ add_test(
   NAME vector_child_program_runtime_tests
   COMMAND vector_child_program_runtime_tests
 )
+
+add_test(NAME vector_host_version
+  COMMAND vector_host version)
+
+add_test(NAME vector_host_list
+  COMMAND vector_host list)
+
+add_test(NAME vector_host_route_tool
+  COMMAND vector_host route tool-execution apply-patch
+    character-alpha component-active subagent-host-demo)
+
+add_test(NAME vector_host_assign_cortex_demo
+  COMMAND vector_host assign-state
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/cortex_host_demo.state
+    tool-execution apply-patch)
+
+add_test(NAME vector_host_assign_audit_only_fails
+  COMMAND vector_host assign-state
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/cortex_host_ingest.state
+    tool-execution apply-patch)
+set_tests_properties(vector_host_assign_audit_only_fails
+  PROPERTIES WILL_FAIL TRUE)
