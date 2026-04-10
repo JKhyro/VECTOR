@@ -83,6 +83,7 @@ It is intentionally bounded. It does not describe every future subsystem. It def
 - Approval-review, artifact, and status/activity routes are now first-class native descriptors as well, so approval resolution, artifact preview, and runtime diagnostics have native ownership before Avalonia rendering is added.
 - CORTEX-to-VECTOR runtime export assignment now uses `vector_child_program_assign_cortex_export`, accepting CORTEX readiness flags and stable reference strings before handing the assignment to VECTOR's native session/tool helper-surface rules.
 - VECTOR can now consume persisted CORTEX host-state files through `vector_child_program_assign_cortex_state_file`, turning the first CORTEX operator host output into a native VECTOR assignment path for session/tool work.
+- `vector_host` provides the first native operator command surface over those descriptors and assignments, keeping the runtime exercisable before managed host interop arrives.
 
 ## Completed next slice
 
