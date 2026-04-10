@@ -72,6 +72,14 @@ static void reset_route(vector_child_program_route *route) {
   }
 }
 
+static void reset_assignment(vector_helper_assignment *assignment) {
+  if (assignment != NULL) {
+    memset(assignment, 0, sizeof(*assignment));
+    assignment->abi_version = VECTOR_CHILD_PROGRAM_RUNTIME_ABI_VERSION;
+    assignment->schema_version = VECTOR_CHILD_PROGRAM_RUNTIME_SCHEMA_VERSION;
+  }
+}
+
 static const vector_child_program_descriptor *find_descriptor(
   vector_workspace_region region
 ) {
@@ -170,6 +178,72 @@ vector_child_program_status vector_child_program_route_region(
   return out_route->status;
 }
 
+vector_child_program_status vector_child_program_assign_helper(
+  const vector_helper_assignment_request *request,
+  vector_helper_assignment *out_assignment
+) {
+  vector_child_program_route route;
+  vector_child_program_route_request route_request;
+  vector_child_program_status status = VECTOR_CHILD_PROGRAM_STATUS_OK;
+
+  if (out_assignment == NULL) {
+    return VECTOR_CHILD_PROGRAM_STATUS_NULL_ARGUMENT;
+  }
+
+  reset_assignment(out_assignment);
+
+  if (request == NULL) {
+    out_assignment->status = VECTOR_CHILD_PROGRAM_STATUS_NULL_ARGUMENT;
+    out_assignment->status_message = "null argument";
+    return out_assignment->status;
+  }
+
+  if (request->abi_version != VECTOR_CHILD_PROGRAM_RUNTIME_ABI_VERSION) {
+    out_assignment->status = VECTOR_CHILD_PROGRAM_STATUS_UNSUPPORTED_ABI;
+    out_assignment->status_message = "unsupported ABI version";
+    return out_assignment->status;
+  }
+
+  if (is_blank(request->helper.helper_id)) {
+    out_assignment->status = VECTOR_CHILD_PROGRAM_STATUS_MISSING_HELPER_REFERENCE;
+    out_assignment->status_message =
+      "helper assignment requires an imported helper reference";
+    return out_assignment->status;
+  }
+
+  memset(&route_request, 0, sizeof(route_request));
+  route_request.abi_version = request->abi_version;
+  route_request.region = request->region;
+  route_request.operation_id = request->operation_id;
+  route_request.cortex = request->cortex;
+
+  status = vector_child_program_route_region(&route_request, &route);
+  out_assignment->status = status;
+  out_assignment->descriptor = route.descriptor;
+  out_assignment->cortex = route.cortex;
+  out_assignment->helper = request->helper;
+
+  if (status != VECTOR_CHILD_PROGRAM_STATUS_OK) {
+    out_assignment->status_message = route.status_message;
+    return out_assignment->status;
+  }
+
+  if (
+    (route.descriptor.flags &
+      VECTOR_CHILD_PROGRAM_FLAG_NON_PERSISTENT_HELPER_SURFACE) == 0u
+  ) {
+    out_assignment->status =
+      VECTOR_CHILD_PROGRAM_STATUS_HELPER_ASSIGNMENT_NOT_ALLOWED;
+    out_assignment->status_message =
+      "routed child program does not accept imported helper assignment";
+    return out_assignment->status;
+  }
+
+  out_assignment->status = VECTOR_CHILD_PROGRAM_STATUS_OK;
+  out_assignment->status_message = "helper assigned";
+  return out_assignment->status;
+}
+
 const char *vector_child_program_status_name(vector_child_program_status status) {
   switch (status) {
     case VECTOR_CHILD_PROGRAM_STATUS_OK:
@@ -182,6 +256,10 @@ const char *vector_child_program_status_name(vector_child_program_status status)
       return "unknown_region";
     case VECTOR_CHILD_PROGRAM_STATUS_MISSING_CORTEX_REFERENCE:
       return "missing_cortex_reference";
+    case VECTOR_CHILD_PROGRAM_STATUS_HELPER_ASSIGNMENT_NOT_ALLOWED:
+      return "helper_assignment_not_allowed";
+    case VECTOR_CHILD_PROGRAM_STATUS_MISSING_HELPER_REFERENCE:
+      return "missing_helper_reference";
     default:
       return "unknown_status";
   }
