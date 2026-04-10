@@ -7,7 +7,13 @@ param(
 
     [string]$WorkDir = (Join-Path $env:TEMP "symbiosis-cortex-vector-installed-smoke"),
 
-    [string]$StateFile
+    [string]$StateFile,
+
+    [string]$CatalogPath,
+
+    [string]$ExpectedHelperId = "host-demo-helper",
+
+    [string]$ExpectedSubagentId = "subagent-host-demo"
 )
 
 if (-not (Test-Path -LiteralPath $CortexHostPath)) {
@@ -22,13 +28,26 @@ if (-not (Test-Path -LiteralPath $VectorHostPath)) {
 
 New-Item -ItemType Directory -Path $WorkDir -Force | Out-Null
 
-if ([string]::IsNullOrWhiteSpace($StateFile)) {
-    $StateFile = Join-Path $WorkDir "cortex_host_demo.state"
+if (-not [string]::IsNullOrWhiteSpace($CatalogPath) -and -not (Test-Path -LiteralPath $CatalogPath)) {
+    Write-Error "catalog TSV not found: $CatalogPath"
+    exit 1
 }
 
-& $CortexHostPath demo $StateFile
+if ([string]::IsNullOrWhiteSpace($StateFile)) {
+    if ([string]::IsNullOrWhiteSpace($CatalogPath)) {
+        $StateFile = Join-Path $WorkDir "cortex_host_demo.state"
+    } else {
+        $StateFile = Join-Path $WorkDir "cortex_host_catalog.state"
+    }
+}
+
+if ([string]::IsNullOrWhiteSpace($CatalogPath)) {
+    & $CortexHostPath demo $StateFile
+} else {
+    & $CortexHostPath bind-catalog $CatalogPath $StateFile
+}
 if ($LASTEXITCODE -ne 0) {
-    Write-Error "cortex_host demo failed for state file: $StateFile"
+    Write-Error "cortex_host state generation failed for state file: $StateFile"
     exit $LASTEXITCODE
 }
 
@@ -49,10 +68,10 @@ if ($exitCode -ne 0) {
 $required = @(
     "status=ok",
     "program=vector-tool-execution-program",
-    "helper=host-demo-helper",
+    "helper=$ExpectedHelperId",
     "character=character-alpha",
     "component=component-active",
-    "subagent=subagent-host-demo"
+    "subagent=$ExpectedSubagentId"
 )
 
 foreach ($token in $required) {
