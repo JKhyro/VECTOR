@@ -18,7 +18,7 @@ static void test_version_contract(void) {
 static void test_descriptor_table(void) {
   vector_child_program_descriptor descriptor;
 
-  assert(vector_child_program_count() == 4u);
+  assert(vector_child_program_count() == 7u);
   assert(
     vector_child_program_at(0u, &descriptor) == VECTOR_CHILD_PROGRAM_STATUS_OK
   );
@@ -53,6 +53,27 @@ static void test_descriptor_table(void) {
   assert(descriptor.primary_lane == VECTOR_DATA_LANE_CODEBASE);
   assert(
     (descriptor.flags & VECTOR_CHILD_PROGRAM_FLAG_REQUIRES_CORTEX_COMPONENT) !=
+    0u
+  );
+
+  assert(
+    vector_child_program_at(4u, &descriptor) == VECTOR_CHILD_PROGRAM_STATUS_OK
+  );
+  assert(strcmp(descriptor.program_id, "vector-approval-review-program") == 0);
+  assert(descriptor.region == VECTOR_WORKSPACE_REGION_APPROVAL_REVIEW);
+
+  assert(
+    vector_child_program_at(5u, &descriptor) == VECTOR_CHILD_PROGRAM_STATUS_OK
+  );
+  assert(strcmp(descriptor.program_id, "vector-artifact-program") == 0);
+  assert(descriptor.primary_lane == VECTOR_DATA_LANE_CODEBASE);
+
+  assert(
+    vector_child_program_at(6u, &descriptor) == VECTOR_CHILD_PROGRAM_STATUS_OK
+  );
+  assert(strcmp(descriptor.program_id, "vector-status-activity-program") == 0);
+  assert(
+    (descriptor.flags & VECTOR_CHILD_PROGRAM_FLAG_REQUIRES_CORTEX_COMPONENT) ==
     0u
   );
 }
@@ -295,6 +316,82 @@ static void test_helper_assignment_preserves_cortex_gate(void) {
   );
 }
 
+static void test_approval_and_artifact_routes_require_cortex_reference(void) {
+  vector_child_program_route route;
+  const vector_child_program_route_request approval_request = {
+    VECTOR_CHILD_PROGRAM_RUNTIME_ABI_VERSION,
+    VECTOR_WORKSPACE_REGION_APPROVAL_REVIEW,
+    "resolve-approval",
+    { "character:atlas", "component:active", NULL }
+  };
+  const vector_child_program_route_request artifact_request = {
+    VECTOR_CHILD_PROGRAM_RUNTIME_ABI_VERSION,
+    VECTOR_WORKSPACE_REGION_ARTIFACT,
+    "preview-patch",
+    { "character:atlas", "component:active", "subagent:worker-1" }
+  };
+  const vector_child_program_route_request missing_cortex_request = {
+    VECTOR_CHILD_PROGRAM_RUNTIME_ABI_VERSION,
+    VECTOR_WORKSPACE_REGION_APPROVAL_REVIEW,
+    "resolve-approval",
+    { "character:atlas", NULL, NULL }
+  };
+
+  assert(
+    vector_child_program_route_region(&approval_request, &route) ==
+    VECTOR_CHILD_PROGRAM_STATUS_OK
+  );
+  assert(
+    strcmp(route.descriptor.program_id, "vector-approval-review-program") == 0
+  );
+
+  assert(
+    vector_child_program_route_region(&artifact_request, &route) ==
+    VECTOR_CHILD_PROGRAM_STATUS_OK
+  );
+  assert(strcmp(route.descriptor.program_id, "vector-artifact-program") == 0);
+  assert(route.descriptor.primary_lane == VECTOR_DATA_LANE_CODEBASE);
+
+  assert(
+    vector_child_program_route_region(&missing_cortex_request, &route) ==
+    VECTOR_CHILD_PROGRAM_STATUS_MISSING_CORTEX_REFERENCE
+  );
+}
+
+static void test_status_activity_routes_without_cortex_reference(void) {
+  vector_child_program_route route;
+  const vector_child_program_route_request request = {
+    VECTOR_CHILD_PROGRAM_RUNTIME_ABI_VERSION,
+    VECTOR_WORKSPACE_REGION_STATUS_ACTIVITY,
+    "show-background-activity",
+    { NULL, NULL, NULL }
+  };
+
+  assert(
+    vector_child_program_route_region(&request, &route) ==
+    VECTOR_CHILD_PROGRAM_STATUS_OK
+  );
+  assert(
+    strcmp(route.descriptor.program_id, "vector-status-activity-program") == 0
+  );
+}
+
+static void test_helper_assignment_rejects_artifact_program(void) {
+  vector_helper_assignment assignment;
+  const vector_helper_assignment_request request = {
+    VECTOR_CHILD_PROGRAM_RUNTIME_ABI_VERSION,
+    VECTOR_WORKSPACE_REGION_ARTIFACT,
+    "preview-patch",
+    { "character:atlas", "component:active", NULL },
+    { "helper:patcher", "manifest:codex-apply-patch", "codex-rs/apply-patch" }
+  };
+
+  assert(
+    vector_child_program_assign_helper(&request, &assignment) ==
+    VECTOR_CHILD_PROGRAM_STATUS_HELPER_ASSIGNMENT_NOT_ALLOWED
+  );
+}
+
 static void test_unsupported_abi_rejected(void) {
   vector_child_program_route route;
   const vector_child_program_route_request request = {
@@ -365,6 +462,22 @@ static void test_name_helpers(void) {
   );
   assert(
     strcmp(
+      vector_workspace_region_name(VECTOR_WORKSPACE_REGION_APPROVAL_REVIEW),
+      "approval_review"
+    ) == 0
+  );
+  assert(
+    strcmp(vector_workspace_region_name(VECTOR_WORKSPACE_REGION_ARTIFACT), "artifact") ==
+    0
+  );
+  assert(
+    strcmp(
+      vector_workspace_region_name(VECTOR_WORKSPACE_REGION_STATUS_ACTIVITY),
+      "status_activity"
+    ) == 0
+  );
+  assert(
+    strcmp(
       vector_child_program_status_name((vector_child_program_status)99),
       "unknown_status"
     ) == 0
@@ -385,6 +498,9 @@ int main(void) {
   test_helper_assignment_rejects_left_menu();
   test_helper_assignment_rejects_missing_helper();
   test_helper_assignment_preserves_cortex_gate();
+  test_approval_and_artifact_routes_require_cortex_reference();
+  test_status_activity_routes_without_cortex_reference();
+  test_helper_assignment_rejects_artifact_program();
   test_unsupported_abi_rejected();
   test_null_and_unknown_inputs();
   test_name_helpers();

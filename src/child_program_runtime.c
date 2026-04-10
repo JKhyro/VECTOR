@@ -54,6 +54,44 @@ static const vector_child_program_descriptor k_child_programs[] = {
       VECTOR_CHILD_PROGRAM_FLAG_UPSTREAM_CODEX_ASSIMILATION |
       VECTOR_CHILD_PROGRAM_FLAG_NON_PERSISTENT_HELPER_SURFACE,
     "openai/codex exec, apply-patch, file-search, and governed tool behavior"
+  },
+  {
+    VECTOR_CHILD_PROGRAM_RUNTIME_ABI_VERSION,
+    VECTOR_CHILD_PROGRAM_RUNTIME_SCHEMA_VERSION,
+    "vector-approval-review-program",
+    "Approval review",
+    VECTOR_WORKSPACE_REGION_APPROVAL_REVIEW,
+    VECTOR_CHILD_PROGRAM_KIND_APPROVAL_REVIEW,
+    VECTOR_DATA_LANE_DEVBASE,
+    VECTOR_CHILD_PROGRAM_FLAG_FIRST_CLASS |
+      VECTOR_CHILD_PROGRAM_FLAG_REQUIRES_CORTEX_COMPONENT |
+      VECTOR_CHILD_PROGRAM_FLAG_UPSTREAM_CODEX_ASSIMILATION,
+    "openai/codex approval request and operator confirmation behavior"
+  },
+  {
+    VECTOR_CHILD_PROGRAM_RUNTIME_ABI_VERSION,
+    VECTOR_CHILD_PROGRAM_RUNTIME_SCHEMA_VERSION,
+    "vector-artifact-program",
+    "Artifact",
+    VECTOR_WORKSPACE_REGION_ARTIFACT,
+    VECTOR_CHILD_PROGRAM_KIND_ARTIFACT,
+    VECTOR_DATA_LANE_CODEBASE,
+    VECTOR_CHILD_PROGRAM_FLAG_FIRST_CLASS |
+      VECTOR_CHILD_PROGRAM_FLAG_REQUIRES_CORTEX_COMPONENT |
+      VECTOR_CHILD_PROGRAM_FLAG_UPSTREAM_CODEX_ASSIMILATION,
+    "openai/codex patch, diff, generated file, and preview artifact behavior"
+  },
+  {
+    VECTOR_CHILD_PROGRAM_RUNTIME_ABI_VERSION,
+    VECTOR_CHILD_PROGRAM_RUNTIME_SCHEMA_VERSION,
+    "vector-status-activity-program",
+    "Status and activity",
+    VECTOR_WORKSPACE_REGION_STATUS_ACTIVITY,
+    VECTOR_CHILD_PROGRAM_KIND_STATUS_ACTIVITY,
+    VECTOR_DATA_LANE_DEVBASE,
+    VECTOR_CHILD_PROGRAM_FLAG_FIRST_CLASS |
+      VECTOR_CHILD_PROGRAM_FLAG_UPSTREAM_CODEX_ASSIMILATION,
+    "openai/codex progress, diagnostics, background activity, and notification behavior"
   }
 };
 
@@ -292,6 +330,12 @@ const char *vector_workspace_region_name(vector_workspace_region region) {
       return "session_runtime";
     case VECTOR_WORKSPACE_REGION_TOOL_EXECUTION:
       return "tool_execution";
+    case VECTOR_WORKSPACE_REGION_APPROVAL_REVIEW:
+      return "approval_review";
+    case VECTOR_WORKSPACE_REGION_ARTIFACT:
+      return "artifact";
+    case VECTOR_WORKSPACE_REGION_STATUS_ACTIVITY:
+      return "status_activity";
     default:
       return "unknown_region";
   }
