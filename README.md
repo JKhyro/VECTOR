@@ -71,6 +71,12 @@ ctest --test-dir "$env:LOCALAPPDATA\VECTOR\child-program-runtime-build" -C Debug
 
 The same build creates `vector_host`, a native command surface for descriptor listing, route checks, and CORTEX host-state assignment previews.
 
+Install the native runtime library, public header, and `vector_host` into a staging prefix with:
+
+```powershell
+cmake --install "$env:LOCALAPPDATA\VECTOR\child-program-runtime-build" --config Debug --prefix "$env:LOCALAPPDATA\VECTOR\install-smoke"
+```
+
 ## Upstream Manifest
 
 Regenerate the local OpenAI Codex component manifest from the cloned source with:
