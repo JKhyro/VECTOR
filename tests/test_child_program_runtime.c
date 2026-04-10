@@ -180,6 +180,121 @@ static void test_tool_execution_rejects_missing_cortex_reference(void) {
   );
 }
 
+static void test_helper_assignment_routes_to_session_runtime(void) {
+  vector_helper_assignment assignment;
+  const vector_helper_assignment_request request = {
+    VECTOR_CHILD_PROGRAM_RUNTIME_ABI_VERSION,
+    VECTOR_WORKSPACE_REGION_SESSION_RUNTIME,
+    "resume-session",
+    { "character:atlas", "component:memory", NULL },
+    { "helper:retrieval", "manifest:codex-core", "codex-rs/core" }
+  };
+
+  assert(
+    vector_child_program_assign_helper(&request, &assignment) ==
+    VECTOR_CHILD_PROGRAM_STATUS_OK
+  );
+  assert(
+    strcmp(
+      assignment.descriptor.program_id,
+      "vector-session-runtime-program"
+    ) == 0
+  );
+  assert(strcmp(assignment.helper.helper_id, "helper:retrieval") == 0);
+  assert(strcmp(assignment.helper.source_manifest_ref, "manifest:codex-core") == 0);
+  assert(
+    strcmp(assignment.helper.upstream_alias, "codex-rs/core") == 0
+  );
+}
+
+static void test_helper_assignment_routes_to_tool_execution(void) {
+  vector_helper_assignment assignment;
+  const vector_helper_assignment_request request = {
+    VECTOR_CHILD_PROGRAM_RUNTIME_ABI_VERSION,
+    VECTOR_WORKSPACE_REGION_TOOL_EXECUTION,
+    "apply-patch",
+    { "character:atlas", "component:active", "subagent:worker-1" },
+    { "helper:patcher", "manifest:codex-apply-patch", "codex-rs/apply-patch" }
+  };
+
+  assert(
+    vector_child_program_assign_helper(&request, &assignment) ==
+    VECTOR_CHILD_PROGRAM_STATUS_OK
+  );
+  assert(
+    strcmp(assignment.descriptor.program_id, "vector-tool-execution-program") ==
+    0
+  );
+  assert(strcmp(assignment.cortex.subagent_instance_id, "subagent:worker-1") == 0);
+  assert(strcmp(assignment.helper.helper_id, "helper:patcher") == 0);
+}
+
+static void test_helper_assignment_rejects_left_menu(void) {
+  vector_helper_assignment assignment;
+  const vector_helper_assignment_request request = {
+    VECTOR_CHILD_PROGRAM_RUNTIME_ABI_VERSION,
+    VECTOR_WORKSPACE_REGION_LEFT_MENU,
+    "open-workspace",
+    { NULL, NULL, NULL },
+    { "helper:navigation", "manifest:codex-app", "codex-rs/app-server" }
+  };
+
+  assert(
+    vector_child_program_assign_helper(&request, &assignment) ==
+    VECTOR_CHILD_PROGRAM_STATUS_HELPER_ASSIGNMENT_NOT_ALLOWED
+  );
+  assert(
+    strcmp(
+      vector_child_program_status_name(assignment.status),
+      "helper_assignment_not_allowed"
+    ) == 0
+  );
+}
+
+static void test_helper_assignment_rejects_missing_helper(void) {
+  vector_helper_assignment assignment;
+  const vector_helper_assignment_request request = {
+    VECTOR_CHILD_PROGRAM_RUNTIME_ABI_VERSION,
+    VECTOR_WORKSPACE_REGION_TOOL_EXECUTION,
+    "apply-patch",
+    { "character:atlas", "component:active", NULL },
+    { NULL, "manifest:codex-apply-patch", "codex-rs/apply-patch" }
+  };
+
+  assert(
+    vector_child_program_assign_helper(&request, &assignment) ==
+    VECTOR_CHILD_PROGRAM_STATUS_MISSING_HELPER_REFERENCE
+  );
+  assert(
+    strcmp(
+      vector_child_program_status_name(assignment.status),
+      "missing_helper_reference"
+    ) == 0
+  );
+}
+
+static void test_helper_assignment_preserves_cortex_gate(void) {
+  vector_helper_assignment assignment;
+  const vector_helper_assignment_request request = {
+    VECTOR_CHILD_PROGRAM_RUNTIME_ABI_VERSION,
+    VECTOR_WORKSPACE_REGION_TOOL_EXECUTION,
+    "apply-patch",
+    { "character:atlas", NULL, NULL },
+    { "helper:patcher", "manifest:codex-apply-patch", "codex-rs/apply-patch" }
+  };
+
+  assert(
+    vector_child_program_assign_helper(&request, &assignment) ==
+    VECTOR_CHILD_PROGRAM_STATUS_MISSING_CORTEX_REFERENCE
+  );
+  assert(
+    strcmp(
+      vector_child_program_status_name(assignment.status),
+      "missing_cortex_reference"
+    ) == 0
+  );
+}
+
 static void test_unsupported_abi_rejected(void) {
   vector_child_program_route route;
   const vector_child_program_route_request request = {
@@ -265,6 +380,11 @@ int main(void) {
   test_session_runtime_routes_with_cortex_reference();
   test_tool_execution_routes_with_cortex_reference();
   test_tool_execution_rejects_missing_cortex_reference();
+  test_helper_assignment_routes_to_session_runtime();
+  test_helper_assignment_routes_to_tool_execution();
+  test_helper_assignment_rejects_left_menu();
+  test_helper_assignment_rejects_missing_helper();
+  test_helper_assignment_preserves_cortex_gate();
   test_unsupported_abi_rejected();
   test_null_and_unknown_inputs();
   test_name_helpers();

@@ -79,6 +79,7 @@ It is intentionally bounded. It does not describe every future subsystem. It def
 - The first native C runtime slice now exposes workspace-region routing through `vector_child_program_route_region`, so the Avalonia host can ask the native runtime for the governing child-program descriptor before rendering left-menu or main-interaction regions.
 - The main-interaction route requires CORTEX character and component references, preserving CORTEX ownership of character/component identity while letting VECTOR consume that state for workspace execution.
 - Session-runtime and tool-execution routes are now first-class native descriptors too; both require CORTEX references and carry non-persistent helper-surface flags so helper-backed work can be assigned without making VECTOR the helper identity owner.
+- Imported helper assignment now uses `vector_child_program_assign_helper` so helper refs bind to native session/tool routes only after CORTEX refs are present and the target descriptor allows non-persistent helper surfaces.
 
 ## Completed next slice
 
