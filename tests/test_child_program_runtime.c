@@ -392,6 +392,136 @@ static void test_helper_assignment_rejects_artifact_program(void) {
   );
 }
 
+static void test_cortex_export_assigns_ready_tool_helper(void) {
+  vector_helper_assignment assignment;
+  const vector_cortex_export_assignment_request request = {
+    VECTOR_CHILD_PROGRAM_RUNTIME_ABI_VERSION,
+    VECTOR_WORKSPACE_REGION_TOOL_EXECUTION,
+    "apply-patch",
+    {
+      { "character:atlas", "component:active", "subagent:worker-1" },
+      {
+        "helper:patcher",
+        "manifest:codex-apply-patch",
+        "codex-rs/apply-patch"
+      },
+      "ready",
+      "active",
+      "active",
+      1u,
+      1u,
+      1u
+    }
+  };
+
+  assert(
+    vector_child_program_assign_cortex_export(&request, &assignment) ==
+    VECTOR_CHILD_PROGRAM_STATUS_OK
+  );
+  assert(
+    strcmp(
+      assignment.descriptor.program_id,
+      "vector-tool-execution-program"
+    ) == 0
+  );
+  assert(strcmp(assignment.cortex.character_id, "character:atlas") == 0);
+  assert(strcmp(assignment.helper.helper_id, "helper:patcher") == 0);
+}
+
+static void test_cortex_export_assigns_ready_session_helper(void) {
+  vector_helper_assignment assignment;
+  const vector_cortex_export_assignment_request request = {
+    VECTOR_CHILD_PROGRAM_RUNTIME_ABI_VERSION,
+    VECTOR_WORKSPACE_REGION_SESSION_RUNTIME,
+    "resume-session",
+    {
+      { "character:atlas", "component:memory", NULL },
+      { "helper:retrieval", "manifest:codex-core", "codex-rs/core" },
+      "ready",
+      "ready",
+      NULL,
+      1u,
+      1u,
+      1u
+    }
+  };
+
+  assert(
+    vector_child_program_assign_cortex_export(&request, &assignment) ==
+    VECTOR_CHILD_PROGRAM_STATUS_OK
+  );
+  assert(
+    strcmp(
+      assignment.descriptor.program_id,
+      "vector-session-runtime-program"
+    ) == 0
+  );
+  assert(strcmp(assignment.cortex.component_id, "component:memory") == 0);
+}
+
+static void test_cortex_export_rejects_not_ready_state(void) {
+  vector_helper_assignment assignment;
+  const vector_cortex_export_assignment_request request = {
+    VECTOR_CHILD_PROGRAM_RUNTIME_ABI_VERSION,
+    VECTOR_WORKSPACE_REGION_TOOL_EXECUTION,
+    "apply-patch",
+    {
+      { "character:atlas", "component:active", "subagent:worker-1" },
+      {
+        "helper:patcher",
+        "manifest:codex-apply-patch",
+        "codex-rs/apply-patch"
+      },
+      "draft",
+      "active",
+      "active",
+      0u,
+      1u,
+      1u
+    }
+  };
+
+  assert(
+    vector_child_program_assign_cortex_export(&request, &assignment) ==
+    VECTOR_CHILD_PROGRAM_STATUS_CORTEX_EXPORT_NOT_READY
+  );
+  assert(
+    strcmp(
+      vector_child_program_status_name(assignment.status),
+      "cortex_export_not_ready"
+    ) == 0
+  );
+  assert(strcmp(assignment.cortex.character_id, "character:atlas") == 0);
+}
+
+static void test_cortex_export_preserves_assignment_validation(void) {
+  vector_helper_assignment assignment;
+  const vector_cortex_export_assignment_request request = {
+    VECTOR_CHILD_PROGRAM_RUNTIME_ABI_VERSION,
+    VECTOR_WORKSPACE_REGION_ARTIFACT,
+    "preview-patch",
+    {
+      { "character:atlas", "component:active", NULL },
+      {
+        "helper:patcher",
+        "manifest:codex-apply-patch",
+        "codex-rs/apply-patch"
+      },
+      "ready",
+      "active",
+      NULL,
+      1u,
+      1u,
+      1u
+    }
+  };
+
+  assert(
+    vector_child_program_assign_cortex_export(&request, &assignment) ==
+    VECTOR_CHILD_PROGRAM_STATUS_HELPER_ASSIGNMENT_NOT_ALLOWED
+  );
+}
+
 static void test_unsupported_abi_rejected(void) {
   vector_child_program_route route;
   const vector_child_program_route_request request = {
@@ -501,6 +631,10 @@ int main(void) {
   test_approval_and_artifact_routes_require_cortex_reference();
   test_status_activity_routes_without_cortex_reference();
   test_helper_assignment_rejects_artifact_program();
+  test_cortex_export_assigns_ready_tool_helper();
+  test_cortex_export_assigns_ready_session_helper();
+  test_cortex_export_rejects_not_ready_state();
+  test_cortex_export_preserves_assignment_validation();
   test_unsupported_abi_rejected();
   test_null_and_unknown_inputs();
   test_name_helpers();

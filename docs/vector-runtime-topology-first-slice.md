@@ -81,6 +81,7 @@ It is intentionally bounded. It does not describe every future subsystem. It def
 - Session-runtime and tool-execution routes are now first-class native descriptors too; both require CORTEX references and carry non-persistent helper-surface flags so helper-backed work can be assigned without making VECTOR the helper identity owner.
 - Imported helper assignment now uses `vector_child_program_assign_helper` so helper refs bind to native session/tool routes only after CORTEX refs are present and the target descriptor allows non-persistent helper surfaces.
 - Approval-review, artifact, and status/activity routes are now first-class native descriptors as well, so approval resolution, artifact preview, and runtime diagnostics have native ownership before Avalonia rendering is added.
+- CORTEX-to-VECTOR runtime export assignment now uses `vector_child_program_assign_cortex_export`, accepting CORTEX readiness flags and stable reference strings before handing the assignment to VECTOR's native session/tool helper-surface rules.
 
 ## Completed next slice
 
