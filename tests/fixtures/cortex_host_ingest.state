@@ -1,0 +1,7 @@
+CORTEX_RUNTIME_STATE	1
+COUNTS	4	0	0	0
+A	1	1	accepted-helper	local-cortex-host	C:/KHYRON/apps/CORTEX/tests/fixtures/cortex_catalog_input.tsv	working-tree	accepted-helper	helper_definition_accepted	imported helper accepted as definition-only descriptor	1	0	0	0	1	1
+A	1	1	narrowed-helper	local-cortex-host	C:/KHYRON/apps/CORTEX/tests/fixtures/cortex_catalog_input.tsv	working-tree	narrowed-helper	host_targets_narrowed	imported helper accepted after unsupported host targets were narrowed	1	1	0	0	1	1
+A	1	1	future-runtime	local-cortex-host	C:/KHYRON/apps/CORTEX/tests/fixtures/cortex_catalog_input.tsv	working-tree	future-runtime	runtime_class_quarantined	runtime class has valid provenance but is not supported yet	4	2	0	3	0	0
+A	1	1	promoted-helper	local-cortex-host	C:/KHYRON/apps/CORTEX/tests/fixtures/cortex_catalog_input.tsv	working-tree	promoted-helper	persistent_identity_promotion_blocked	imported descriptors may not become persistent identities by default	0	3	0	9	0	0
+END

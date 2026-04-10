@@ -1,0 +1,8 @@
+CORTEX_RUNTIME_STATE	1
+COUNTS	1	1	2	1
+A	1	1	host-demo-helper	JKhyro/SYMBIOSIS	.codex/agents/host-demo.toml	5f855c11f9117541da31e7274b738cc396d4d3c7	host-demo-helper	helper_definition_accepted	imported helper accepted as definition-only descriptor	1	0	0	0	1	1
+C	character-alpha	symbiote-primary	2	4	0	2
+M	component-active	symbiote-primary	0	1	4	12	1
+M	component-memory	curator-memory	1	2	3	12	0
+S	subagent-host-demo	host-demo-helper	0	2	1
+END

@@ -1,6 +1,10 @@
 #include "vector/child_program_runtime.h"
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+
+#define VECTOR_STATE_LINE_CAPACITY 1024u
 
 static const vector_child_program_descriptor k_child_programs[] = {
   {
@@ -102,6 +106,71 @@ static int is_blank(const char *value) {
   return value == NULL || value[0] == '\0';
 }
 
+static int copy_owned(char *target, size_t capacity, const char *source) {
+  size_t length = source == NULL ? 0u : strlen(source);
+
+  if (target == NULL || capacity == 0u || length >= capacity) {
+    return 0;
+  }
+
+  if (source == NULL) {
+    target[0] = '\0';
+  } else {
+    memcpy(target, source, length + 1u);
+  }
+
+  return 1;
+}
+
+static void strip_line_endings(char *value) {
+  size_t length = 0u;
+
+  if (value == NULL) {
+    return;
+  }
+
+  length = strlen(value);
+  while (length > 0u &&
+         (value[length - 1u] == '\r' || value[length - 1u] == '\n')) {
+    value[length - 1u] = '\0';
+    --length;
+  }
+}
+
+static int parse_size_field(const char *value, size_t *out_value) {
+  char *end = NULL;
+  unsigned long parsed = 0u;
+
+  if (is_blank(value) || out_value == NULL) {
+    return 0;
+  }
+
+  parsed = strtoul(value, &end, 10);
+  if (end == value || *end != '\0') {
+    return 0;
+  }
+
+  *out_value = (size_t)parsed;
+  return 1;
+}
+
+static size_t split_tabs(char *line, char *fields[], size_t field_capacity) {
+  size_t count = 0u;
+  char *cursor = line;
+
+  while (count < field_capacity) {
+    fields[count++] = cursor;
+    cursor = strchr(cursor, '\t');
+    if (cursor == NULL) {
+      break;
+    }
+    *cursor = '\0';
+    ++cursor;
+  }
+
+  return count;
+}
+
 static void reset_route(vector_child_program_route *route) {
   if (route != NULL) {
     memset(route, 0, sizeof(*route));
@@ -111,6 +180,14 @@ static void reset_route(vector_child_program_route *route) {
 }
 
 static void reset_assignment(vector_helper_assignment *assignment) {
+  if (assignment != NULL) {
+    memset(assignment, 0, sizeof(*assignment));
+    assignment->abi_version = VECTOR_CHILD_PROGRAM_RUNTIME_ABI_VERSION;
+    assignment->schema_version = VECTOR_CHILD_PROGRAM_RUNTIME_SCHEMA_VERSION;
+  }
+}
+
+static void reset_owned_assignment(vector_owned_helper_assignment *assignment) {
   if (assignment != NULL) {
     memset(assignment, 0, sizeof(*assignment));
     assignment->abi_version = VECTOR_CHILD_PROGRAM_RUNTIME_ABI_VERSION;
@@ -330,6 +407,220 @@ vector_child_program_status vector_child_program_assign_cortex_export(
   return vector_child_program_assign_helper(&assignment_request, out_assignment);
 }
 
+vector_child_program_status vector_child_program_assign_cortex_state_file(
+  const vector_cortex_state_assignment_request *request,
+  vector_owned_helper_assignment *out_assignment
+) {
+  FILE *file = NULL;
+  char line[VECTOR_STATE_LINE_CAPACITY];
+  char *fields[16];
+  size_t component_index = 0u;
+  size_t selected_component_index = (size_t)-1;
+  vector_cortex_export_assignment_request export_request;
+  vector_helper_assignment assignment;
+
+  if (out_assignment == NULL) {
+    return VECTOR_CHILD_PROGRAM_STATUS_NULL_ARGUMENT;
+  }
+
+  reset_owned_assignment(out_assignment);
+
+  if (request == NULL) {
+    out_assignment->status = VECTOR_CHILD_PROGRAM_STATUS_NULL_ARGUMENT;
+    copy_owned(
+      out_assignment->status_message,
+      sizeof(out_assignment->status_message),
+      "null argument"
+    );
+    return out_assignment->status;
+  }
+
+  if (request->abi_version != VECTOR_CHILD_PROGRAM_RUNTIME_ABI_VERSION) {
+    out_assignment->status = VECTOR_CHILD_PROGRAM_STATUS_UNSUPPORTED_ABI;
+    copy_owned(
+      out_assignment->status_message,
+      sizeof(out_assignment->status_message),
+      "unsupported ABI version"
+    );
+    return out_assignment->status;
+  }
+
+  if (is_blank(request->state_path)) {
+    out_assignment->status = VECTOR_CHILD_PROGRAM_STATUS_CORTEX_STATE_IO;
+    copy_owned(
+      out_assignment->status_message,
+      sizeof(out_assignment->status_message),
+      "CORTEX state path is required"
+    );
+    return out_assignment->status;
+  }
+
+#if defined(_MSC_VER)
+  if (fopen_s(&file, request->state_path, "rb") != 0) {
+    file = NULL;
+  }
+#else
+  file = fopen(request->state_path, "rb");
+#endif
+
+  if (file == NULL) {
+    out_assignment->status = VECTOR_CHILD_PROGRAM_STATUS_CORTEX_STATE_IO;
+    copy_owned(
+      out_assignment->status_message,
+      sizeof(out_assignment->status_message),
+      "CORTEX state file could not be opened"
+    );
+    return out_assignment->status;
+  }
+
+  while (fgets(line, sizeof(line), file) != NULL) {
+    strip_line_endings(line);
+    if (line[0] == '\0') {
+      continue;
+    }
+
+    if (line[0] == 'A' && line[1] == '\t') {
+      size_t count = split_tabs(line, fields, 16u);
+      size_t can_bind = 0u;
+      if (count == 16u &&
+          parse_size_field(fields[15], &can_bind) &&
+          can_bind == 1u &&
+          out_assignment->helper_id[0] == '\0') {
+        if (!copy_owned(out_assignment->helper_id,
+                        sizeof(out_assignment->helper_id), fields[7]) ||
+            !copy_owned(out_assignment->source_manifest_ref,
+                        sizeof(out_assignment->source_manifest_ref), fields[5]) ||
+            !copy_owned(out_assignment->upstream_alias,
+                        sizeof(out_assignment->upstream_alias), fields[3])) {
+          (void)fclose(file);
+          out_assignment->status =
+            VECTOR_CHILD_PROGRAM_STATUS_CORTEX_STATE_PARSE_FAILED;
+          copy_owned(
+            out_assignment->status_message,
+            sizeof(out_assignment->status_message),
+            "CORTEX audit values exceed VECTOR capacity"
+          );
+          return out_assignment->status;
+        }
+      }
+    } else if (line[0] == 'C' && line[1] == '\t') {
+      size_t count = split_tabs(line, fields, 7u);
+      size_t lifecycle_state = 0u;
+      if (count == 7u &&
+          parse_size_field(fields[4], &lifecycle_state) &&
+          lifecycle_state >= 3u &&
+          out_assignment->character_id[0] == '\0') {
+        if (!copy_owned(out_assignment->character_id,
+                        sizeof(out_assignment->character_id), fields[1])) {
+          (void)fclose(file);
+          out_assignment->status =
+            VECTOR_CHILD_PROGRAM_STATUS_CORTEX_STATE_PARSE_FAILED;
+          copy_owned(
+            out_assignment->status_message,
+            sizeof(out_assignment->status_message),
+            "CORTEX character id exceeds VECTOR capacity"
+          );
+          return out_assignment->status;
+        }
+      }
+    } else if (line[0] == 'M' && line[1] == '\t') {
+      size_t count = split_tabs(line, fields, 8u);
+      size_t lifecycle_state = 0u;
+      if (count == 8u &&
+          parse_size_field(fields[5], &lifecycle_state) &&
+          lifecycle_state >= 3u &&
+          out_assignment->component_id[0] == '\0') {
+        if (!copy_owned(out_assignment->component_id,
+                        sizeof(out_assignment->component_id), fields[1])) {
+          (void)fclose(file);
+          out_assignment->status =
+            VECTOR_CHILD_PROGRAM_STATUS_CORTEX_STATE_PARSE_FAILED;
+          copy_owned(
+            out_assignment->status_message,
+            sizeof(out_assignment->status_message),
+            "CORTEX component id exceeds VECTOR capacity"
+          );
+          return out_assignment->status;
+        }
+        selected_component_index = component_index;
+      }
+      ++component_index;
+    } else if (line[0] == 'S' && line[1] == '\t') {
+      size_t count = split_tabs(line, fields, 6u);
+      size_t subagent_component_index = 0u;
+      size_t lifecycle_state = 0u;
+      size_t imported_definition = 0u;
+      if (count == 6u &&
+          parse_size_field(fields[3], &subagent_component_index) &&
+          parse_size_field(fields[4], &lifecycle_state) &&
+          parse_size_field(fields[5], &imported_definition) &&
+          lifecycle_state >= 2u &&
+          imported_definition == 1u &&
+          subagent_component_index == selected_component_index &&
+          out_assignment->subagent_instance_id[0] == '\0') {
+        if (!copy_owned(out_assignment->subagent_instance_id,
+                        sizeof(out_assignment->subagent_instance_id), fields[1])) {
+          (void)fclose(file);
+          out_assignment->status =
+            VECTOR_CHILD_PROGRAM_STATUS_CORTEX_STATE_PARSE_FAILED;
+          copy_owned(
+            out_assignment->status_message,
+            sizeof(out_assignment->status_message),
+            "CORTEX subagent id exceeds VECTOR capacity"
+          );
+          return out_assignment->status;
+        }
+      }
+    }
+  }
+
+  if (ferror(file)) {
+    (void)fclose(file);
+    out_assignment->status = VECTOR_CHILD_PROGRAM_STATUS_CORTEX_STATE_IO;
+    copy_owned(
+      out_assignment->status_message,
+      sizeof(out_assignment->status_message),
+      "CORTEX state file could not be read"
+    );
+    return out_assignment->status;
+  }
+  (void)fclose(file);
+
+  out_assignment->cortex.character_id = out_assignment->character_id;
+  out_assignment->cortex.component_id = out_assignment->component_id;
+  out_assignment->cortex.subagent_instance_id =
+    out_assignment->subagent_instance_id[0] == '\0'
+      ? NULL
+      : out_assignment->subagent_instance_id;
+  out_assignment->helper.helper_id = out_assignment->helper_id;
+  out_assignment->helper.source_manifest_ref =
+    out_assignment->source_manifest_ref;
+  out_assignment->helper.upstream_alias = out_assignment->upstream_alias;
+
+  memset(&export_request, 0, sizeof(export_request));
+  export_request.abi_version = request->abi_version;
+  export_request.region = request->region;
+  export_request.operation_id = request->operation_id;
+  export_request.runtime_export.cortex = out_assignment->cortex;
+  export_request.runtime_export.helper = out_assignment->helper;
+  export_request.runtime_export.character_ready =
+    out_assignment->character_id[0] == '\0' ? 0u : 1u;
+  export_request.runtime_export.component_ready =
+    out_assignment->component_id[0] == '\0' ? 0u : 1u;
+  export_request.runtime_export.helper_can_bind =
+    out_assignment->helper_id[0] == '\0' ? 0u : 1u;
+
+  out_assignment->status =
+    vector_child_program_assign_cortex_export(&export_request, &assignment);
+  out_assignment->descriptor = assignment.descriptor;
+  copy_owned(
+    out_assignment->status_message,
+    sizeof(out_assignment->status_message),
+    assignment.status_message
+  );
+  return out_assignment->status;
+}
+
 const char *vector_child_program_status_name(vector_child_program_status status) {
   switch (status) {
     case VECTOR_CHILD_PROGRAM_STATUS_OK:
@@ -348,6 +639,10 @@ const char *vector_child_program_status_name(vector_child_program_status status)
       return "missing_helper_reference";
     case VECTOR_CHILD_PROGRAM_STATUS_CORTEX_EXPORT_NOT_READY:
       return "cortex_export_not_ready";
+    case VECTOR_CHILD_PROGRAM_STATUS_CORTEX_STATE_IO:
+      return "cortex_state_io";
+    case VECTOR_CHILD_PROGRAM_STATUS_CORTEX_STATE_PARSE_FAILED:
+      return "cortex_state_parse_failed";
     default:
       return "unknown_status";
   }

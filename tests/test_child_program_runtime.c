@@ -2,7 +2,12 @@
 
 #include <assert.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <string.h>
+
+#ifndef VECTOR_TEST_FIXTURE_DIR
+#define VECTOR_TEST_FIXTURE_DIR "."
+#endif
 
 static void test_version_contract(void) {
   assert(
@@ -522,6 +527,93 @@ static void test_cortex_export_preserves_assignment_validation(void) {
   );
 }
 
+static void make_fixture_path(
+  char *target,
+  size_t target_capacity,
+  const char *file_name
+) {
+  int written = snprintf(
+    target,
+    target_capacity,
+    "%s/%s",
+    VECTOR_TEST_FIXTURE_DIR,
+    file_name
+  );
+  assert(written > 0);
+  assert((size_t)written < target_capacity);
+}
+
+static void test_cortex_state_file_assigns_tool_helper(void) {
+  char state_path[512];
+  vector_owned_helper_assignment assignment;
+  vector_cortex_state_assignment_request request;
+
+  make_fixture_path(state_path, sizeof(state_path), "cortex_host_demo.state");
+
+  memset(&request, 0, sizeof(request));
+  request.abi_version = VECTOR_CHILD_PROGRAM_RUNTIME_ABI_VERSION;
+  request.region = VECTOR_WORKSPACE_REGION_TOOL_EXECUTION;
+  request.operation_id = "apply-patch";
+  request.state_path = state_path;
+
+  assert(
+    vector_child_program_assign_cortex_state_file(&request, &assignment) ==
+    VECTOR_CHILD_PROGRAM_STATUS_OK
+  );
+  assert(strcmp(assignment.character_id, "character-alpha") == 0);
+  assert(strcmp(assignment.component_id, "component-active") == 0);
+  assert(strcmp(assignment.subagent_instance_id, "subagent-host-demo") == 0);
+  assert(strcmp(assignment.helper_id, "host-demo-helper") == 0);
+  assert(
+    strcmp(
+      assignment.descriptor.program_id,
+      "vector-tool-execution-program"
+    ) == 0
+  );
+}
+
+static void test_cortex_state_file_rejects_audit_only_state(void) {
+  char state_path[512];
+  vector_owned_helper_assignment assignment;
+  vector_cortex_state_assignment_request request;
+
+  make_fixture_path(state_path, sizeof(state_path), "cortex_host_ingest.state");
+
+  memset(&request, 0, sizeof(request));
+  request.abi_version = VECTOR_CHILD_PROGRAM_RUNTIME_ABI_VERSION;
+  request.region = VECTOR_WORKSPACE_REGION_TOOL_EXECUTION;
+  request.operation_id = "apply-patch";
+  request.state_path = state_path;
+
+  assert(
+    vector_child_program_assign_cortex_state_file(&request, &assignment) ==
+    VECTOR_CHILD_PROGRAM_STATUS_CORTEX_EXPORT_NOT_READY
+  );
+  assert(strcmp(assignment.helper_id, "accepted-helper") == 0);
+  assert(assignment.character_id[0] == '\0');
+}
+
+static void test_cortex_state_file_reports_missing_file(void) {
+  vector_owned_helper_assignment assignment;
+  const vector_cortex_state_assignment_request request = {
+    VECTOR_CHILD_PROGRAM_RUNTIME_ABI_VERSION,
+    VECTOR_WORKSPACE_REGION_TOOL_EXECUTION,
+    "apply-patch",
+    "missing-cortex-state-file.state"
+  };
+
+  assert(
+    vector_child_program_assign_cortex_state_file(&request, &assignment) ==
+    VECTOR_CHILD_PROGRAM_STATUS_CORTEX_STATE_IO
+  );
+  assert(
+    strcmp(
+      vector_child_program_status_name(assignment.status),
+      "cortex_state_io"
+    ) == 0
+  );
+}
+
 static void test_unsupported_abi_rejected(void) {
   vector_child_program_route route;
   const vector_child_program_route_request request = {
@@ -635,6 +727,9 @@ int main(void) {
   test_cortex_export_assigns_ready_session_helper();
   test_cortex_export_rejects_not_ready_state();
   test_cortex_export_preserves_assignment_validation();
+  test_cortex_state_file_assigns_tool_helper();
+  test_cortex_state_file_rejects_audit_only_state();
+  test_cortex_state_file_reports_missing_file();
   test_unsupported_abi_rejected();
   test_null_and_unknown_inputs();
   test_name_helpers();

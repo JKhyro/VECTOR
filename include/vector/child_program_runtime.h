@@ -19,8 +19,13 @@ typedef enum vector_child_program_status {
   VECTOR_CHILD_PROGRAM_STATUS_MISSING_CORTEX_REFERENCE = 4,
   VECTOR_CHILD_PROGRAM_STATUS_HELPER_ASSIGNMENT_NOT_ALLOWED = 5,
   VECTOR_CHILD_PROGRAM_STATUS_MISSING_HELPER_REFERENCE = 6,
-  VECTOR_CHILD_PROGRAM_STATUS_CORTEX_EXPORT_NOT_READY = 7
+  VECTOR_CHILD_PROGRAM_STATUS_CORTEX_EXPORT_NOT_READY = 7,
+  VECTOR_CHILD_PROGRAM_STATUS_CORTEX_STATE_IO = 8,
+  VECTOR_CHILD_PROGRAM_STATUS_CORTEX_STATE_PARSE_FAILED = 9
 } vector_child_program_status;
+
+#define VECTOR_CORTEX_REF_CAPACITY 128u
+#define VECTOR_CORTEX_MESSAGE_CAPACITY 256u
 
 typedef enum vector_workspace_region {
   VECTOR_WORKSPACE_REGION_LEFT_MENU = 1,
@@ -124,6 +129,13 @@ typedef struct vector_cortex_export_assignment_request {
   vector_cortex_runtime_export runtime_export;
 } vector_cortex_export_assignment_request;
 
+typedef struct vector_cortex_state_assignment_request {
+  uint32_t abi_version;
+  vector_workspace_region region;
+  const char *operation_id;
+  const char *state_path;
+} vector_cortex_state_assignment_request;
+
 typedef struct vector_helper_assignment {
   uint32_t abi_version;
   uint32_t schema_version;
@@ -133,6 +145,22 @@ typedef struct vector_helper_assignment {
   vector_imported_helper_reference helper;
   const char *status_message;
 } vector_helper_assignment;
+
+typedef struct vector_owned_helper_assignment {
+  uint32_t abi_version;
+  uint32_t schema_version;
+  vector_child_program_status status;
+  vector_child_program_descriptor descriptor;
+  vector_cortex_reference cortex;
+  vector_imported_helper_reference helper;
+  char character_id[VECTOR_CORTEX_REF_CAPACITY];
+  char component_id[VECTOR_CORTEX_REF_CAPACITY];
+  char subagent_instance_id[VECTOR_CORTEX_REF_CAPACITY];
+  char helper_id[VECTOR_CORTEX_REF_CAPACITY];
+  char source_manifest_ref[VECTOR_CORTEX_REF_CAPACITY];
+  char upstream_alias[VECTOR_CORTEX_REF_CAPACITY];
+  char status_message[VECTOR_CORTEX_MESSAGE_CAPACITY];
+} vector_owned_helper_assignment;
 
 uint32_t vector_child_program_runtime_abi_version(void);
 uint32_t vector_child_program_runtime_schema_version(void);
@@ -157,6 +185,11 @@ vector_child_program_status vector_child_program_assign_helper(
 vector_child_program_status vector_child_program_assign_cortex_export(
   const vector_cortex_export_assignment_request *request,
   vector_helper_assignment *out_assignment
+);
+
+vector_child_program_status vector_child_program_assign_cortex_state_file(
+  const vector_cortex_state_assignment_request *request,
+  vector_owned_helper_assignment *out_assignment
 );
 
 const char *vector_child_program_status_name(vector_child_program_status status);
