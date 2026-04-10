@@ -26,6 +26,34 @@ static const vector_child_program_descriptor k_child_programs[] = {
       VECTOR_CHILD_PROGRAM_FLAG_REQUIRES_CORTEX_COMPONENT |
       VECTOR_CHILD_PROGRAM_FLAG_UPSTREAM_CODEX_ASSIMILATION,
     "openai/codex session, turn, approval, artifact, and tool interaction behavior"
+  },
+  {
+    VECTOR_CHILD_PROGRAM_RUNTIME_ABI_VERSION,
+    VECTOR_CHILD_PROGRAM_RUNTIME_SCHEMA_VERSION,
+    "vector-session-runtime-program",
+    "Session runtime",
+    VECTOR_WORKSPACE_REGION_SESSION_RUNTIME,
+    VECTOR_CHILD_PROGRAM_KIND_SESSION_RUNTIME,
+    VECTOR_DATA_LANE_DEVBASE,
+    VECTOR_CHILD_PROGRAM_FLAG_FIRST_CLASS |
+      VECTOR_CHILD_PROGRAM_FLAG_REQUIRES_CORTEX_COMPONENT |
+      VECTOR_CHILD_PROGRAM_FLAG_UPSTREAM_CODEX_ASSIMILATION |
+      VECTOR_CHILD_PROGRAM_FLAG_NON_PERSISTENT_HELPER_SURFACE,
+    "openai/codex core session lifecycle and resumable turn behavior"
+  },
+  {
+    VECTOR_CHILD_PROGRAM_RUNTIME_ABI_VERSION,
+    VECTOR_CHILD_PROGRAM_RUNTIME_SCHEMA_VERSION,
+    "vector-tool-execution-program",
+    "Tool execution",
+    VECTOR_WORKSPACE_REGION_TOOL_EXECUTION,
+    VECTOR_CHILD_PROGRAM_KIND_TOOL_EXECUTION,
+    VECTOR_DATA_LANE_CODEBASE,
+    VECTOR_CHILD_PROGRAM_FLAG_FIRST_CLASS |
+      VECTOR_CHILD_PROGRAM_FLAG_REQUIRES_CORTEX_COMPONENT |
+      VECTOR_CHILD_PROGRAM_FLAG_UPSTREAM_CODEX_ASSIMILATION |
+      VECTOR_CHILD_PROGRAM_FLAG_NON_PERSISTENT_HELPER_SURFACE,
+    "openai/codex exec, apply-patch, file-search, and governed tool behavior"
   }
 };
 
@@ -182,6 +210,10 @@ const char *vector_workspace_region_name(vector_workspace_region region) {
       return "left_menu";
     case VECTOR_WORKSPACE_REGION_MAIN_INTERACTION:
       return "main_interaction";
+    case VECTOR_WORKSPACE_REGION_SESSION_RUNTIME:
+      return "session_runtime";
+    case VECTOR_WORKSPACE_REGION_TOOL_EXECUTION:
+      return "tool_execution";
     default:
       return "unknown_region";
   }

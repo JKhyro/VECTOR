@@ -18,7 +18,7 @@ static void test_version_contract(void) {
 static void test_descriptor_table(void) {
   vector_child_program_descriptor descriptor;
 
-  assert(vector_child_program_count() == 2u);
+  assert(vector_child_program_count() == 4u);
   assert(
     vector_child_program_at(0u, &descriptor) == VECTOR_CHILD_PROGRAM_STATUS_OK
   );
@@ -31,6 +31,26 @@ static void test_descriptor_table(void) {
   );
   assert(strcmp(descriptor.program_id, "vector-main-interaction-program") == 0);
   assert(descriptor.region == VECTOR_WORKSPACE_REGION_MAIN_INTERACTION);
+  assert(
+    (descriptor.flags & VECTOR_CHILD_PROGRAM_FLAG_REQUIRES_CORTEX_COMPONENT) !=
+    0u
+  );
+
+  assert(
+    vector_child_program_at(2u, &descriptor) == VECTOR_CHILD_PROGRAM_STATUS_OK
+  );
+  assert(strcmp(descriptor.program_id, "vector-session-runtime-program") == 0);
+  assert(descriptor.region == VECTOR_WORKSPACE_REGION_SESSION_RUNTIME);
+  assert(
+    (descriptor.flags &
+      VECTOR_CHILD_PROGRAM_FLAG_NON_PERSISTENT_HELPER_SURFACE) != 0u
+  );
+
+  assert(
+    vector_child_program_at(3u, &descriptor) == VECTOR_CHILD_PROGRAM_STATUS_OK
+  );
+  assert(strcmp(descriptor.program_id, "vector-tool-execution-program") == 0);
+  assert(descriptor.primary_lane == VECTOR_DATA_LANE_CODEBASE);
   assert(
     (descriptor.flags & VECTOR_CHILD_PROGRAM_FLAG_REQUIRES_CORTEX_COMPONENT) !=
     0u
@@ -99,6 +119,67 @@ static void test_main_interaction_rejects_missing_cortex_reference(void) {
   );
 }
 
+static void test_session_runtime_routes_with_cortex_reference(void) {
+  vector_child_program_route route;
+  const vector_child_program_route_request request = {
+    VECTOR_CHILD_PROGRAM_RUNTIME_ABI_VERSION,
+    VECTOR_WORKSPACE_REGION_SESSION_RUNTIME,
+    "resume-session",
+    { "character:atlas", "component:memory", NULL }
+  };
+
+  assert(
+    vector_child_program_route_region(&request, &route) ==
+    VECTOR_CHILD_PROGRAM_STATUS_OK
+  );
+  assert(
+    strcmp(route.descriptor.program_id, "vector-session-runtime-program") == 0
+  );
+  assert(route.descriptor.primary_lane == VECTOR_DATA_LANE_DEVBASE);
+  assert(strcmp(route.cortex.component_id, "component:memory") == 0);
+}
+
+static void test_tool_execution_routes_with_cortex_reference(void) {
+  vector_child_program_route route;
+  const vector_child_program_route_request request = {
+    VECTOR_CHILD_PROGRAM_RUNTIME_ABI_VERSION,
+    VECTOR_WORKSPACE_REGION_TOOL_EXECUTION,
+    "apply-patch",
+    { "character:atlas", "component:active", "subagent:worker-1" }
+  };
+
+  assert(
+    vector_child_program_route_region(&request, &route) ==
+    VECTOR_CHILD_PROGRAM_STATUS_OK
+  );
+  assert(
+    strcmp(route.descriptor.program_id, "vector-tool-execution-program") == 0
+  );
+  assert(route.descriptor.primary_lane == VECTOR_DATA_LANE_CODEBASE);
+  assert(
+    (route.descriptor.flags &
+      VECTOR_CHILD_PROGRAM_FLAG_NON_PERSISTENT_HELPER_SURFACE) != 0u
+  );
+}
+
+static void test_tool_execution_rejects_missing_cortex_reference(void) {
+  vector_child_program_route route;
+  const vector_child_program_route_request request = {
+    VECTOR_CHILD_PROGRAM_RUNTIME_ABI_VERSION,
+    VECTOR_WORKSPACE_REGION_TOOL_EXECUTION,
+    "apply-patch",
+    { NULL, "component:active", "subagent:worker-1" }
+  };
+
+  assert(
+    vector_child_program_route_region(&request, &route) ==
+    VECTOR_CHILD_PROGRAM_STATUS_MISSING_CORTEX_REFERENCE
+  );
+  assert(
+    strcmp(route.descriptor.program_id, "vector-tool-execution-program") == 0
+  );
+}
+
 static void test_unsupported_abi_rejected(void) {
   vector_child_program_route route;
   const vector_child_program_route_request request = {
@@ -157,6 +238,18 @@ static void test_name_helpers(void) {
   );
   assert(
     strcmp(
+      vector_workspace_region_name(VECTOR_WORKSPACE_REGION_SESSION_RUNTIME),
+      "session_runtime"
+    ) == 0
+  );
+  assert(
+    strcmp(
+      vector_workspace_region_name(VECTOR_WORKSPACE_REGION_TOOL_EXECUTION),
+      "tool_execution"
+    ) == 0
+  );
+  assert(
+    strcmp(
       vector_child_program_status_name((vector_child_program_status)99),
       "unknown_status"
     ) == 0
@@ -169,6 +262,9 @@ int main(void) {
   test_left_menu_routes_without_cortex_reference();
   test_main_interaction_requires_cortex_reference();
   test_main_interaction_rejects_missing_cortex_reference();
+  test_session_runtime_routes_with_cortex_reference();
+  test_tool_execution_routes_with_cortex_reference();
+  test_tool_execution_rejects_missing_cortex_reference();
   test_unsupported_abi_rejected();
   test_null_and_unknown_inputs();
   test_name_helpers();
