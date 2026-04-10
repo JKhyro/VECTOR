@@ -6,7 +6,7 @@ It exists because VECTOR is cloning and transforming Codex, not merely referenci
 
 ## Source Reference
 
-- Local upstream clone: `C:\Users\Allan\OneDrive\Documents\New project.references\openai-codex`
+- Local upstream clone: set `OPENAI_CODEX_ROOT`, pass `-OpenAiCodexRoot`, or place an `openai-codex` clone beside the VECTOR repository
 - Current inspected upstream commit: `5bbfee69b`
 - Upstream root surface: Codex CLI/runtime monorepo
 - Desktop entry claim: upstream README routes the desktop experience through `codex app`

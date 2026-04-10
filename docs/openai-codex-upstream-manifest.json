@@ -1,8 +1,8 @@
 ﻿{
-    "generatedAt":  "2026-04-10T08:49:54.000Z",
+    "generatedAt":  "2026-04-10T13:31:06.000Z",
     "upstream":  {
                      "repository":  "https://github.com/openai/codex",
-                     "localPath":  "C:\\Users\\Allan\\OneDrive\\Documents\\New project.references\\openai-codex",
+                     "localPath":  "provided-by-OpenAiCodexRoot-or-OPENAI_CODEX_ROOT",
                      "branch":  "main",
                      "commit":  "5bbfee69b6e7fbd519b7aa1d344304e26a647092"
                  },

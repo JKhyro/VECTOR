@@ -62,7 +62,10 @@ The explicit CORTEX-to-VECTOR execution boundary now lives in [`docs/vector-char
 Regenerate the local OpenAI Codex component manifest from the cloned source with:
 
 ```powershell
+$env:OPENAI_CODEX_ROOT = "C:\path\to\openai-codex"
 powershell -ExecutionPolicy Bypass -File tools\write-codex-upstream-manifest.ps1
 ```
+
+You can also pass the source clone directly with `-OpenAiCodexRoot C:\path\to\openai-codex`. If neither is provided, the script checks for a sibling `openai-codex` clone beside the VECTOR repository.
 
 GitHub Discussions are currently disabled for this repository, so execution truth for now lives in the repo README, issues, and the VECTOR project.

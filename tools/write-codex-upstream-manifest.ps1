@@ -1,9 +1,40 @@
 param(
-  [string]$OpenAiCodexRoot = "C:\Users\Allan\OneDrive\Documents\New project.references\openai-codex",
+  [string]$OpenAiCodexRoot = "",
   [string]$OutputPath = "docs\openai-codex-upstream-manifest.json"
 )
 
 $ErrorActionPreference = "Stop"
+
+$RepoRoot = Split-Path -Parent $PSScriptRoot
+
+function Resolve-OpenAiCodexRoot {
+  param(
+    [string]$RequestedRoot,
+    [string]$RepositoryRoot
+  )
+
+  $candidateRoots = @()
+
+  if (-not [string]::IsNullOrWhiteSpace($RequestedRoot)) {
+    $candidateRoots += $RequestedRoot
+  }
+
+  if (-not [string]::IsNullOrWhiteSpace($env:OPENAI_CODEX_ROOT)) {
+    $candidateRoots += $env:OPENAI_CODEX_ROOT
+  }
+
+  $repositoryParent = Split-Path -Parent $RepositoryRoot
+  $candidateRoots += Join-Path $repositoryParent "openai-codex"
+  $candidateRoots += Join-Path $repositoryParent "New project.references\openai-codex"
+
+  foreach ($candidateRoot in $candidateRoots) {
+    if (Test-Path -LiteralPath $candidateRoot -PathType Container) {
+      return (Resolve-Path -LiteralPath $candidateRoot).Path
+    }
+  }
+
+  throw "OpenAI Codex root not found. Pass -OpenAiCodexRoot, set OPENAI_CODEX_ROOT, or clone openai/codex beside this repo. Checked: $($candidateRoots -join '; ')"
+}
 
 function Get-GitValue {
   param(
@@ -24,11 +55,7 @@ function Get-GitValue {
   }
 }
 
-if (-not (Test-Path -LiteralPath $OpenAiCodexRoot -PathType Container)) {
-  throw "OpenAI Codex root not found: $OpenAiCodexRoot"
-}
-
-$root = (Resolve-Path -LiteralPath $OpenAiCodexRoot).Path
+$root = Resolve-OpenAiCodexRoot -RequestedRoot $OpenAiCodexRoot -RepositoryRoot $RepoRoot
 $commit = Get-GitValue -WorkingDirectory $root -Arguments @("rev-parse", "HEAD")
 $branch = Get-GitValue -WorkingDirectory $root -Arguments @("rev-parse", "--abbrev-ref", "HEAD")
 
@@ -73,7 +100,7 @@ $manifest = [ordered]@{
   generatedAt = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.000Z")
   upstream = [ordered]@{
     repository = "https://github.com/openai/codex"
-    localPath = $root
+    localPath = "provided-by-OpenAiCodexRoot-or-OPENAI_CODEX_ROOT"
     branch = $branch
     commit = $commit
   }
@@ -94,7 +121,7 @@ $manifest = [ordered]@{
 $output = if ([System.IO.Path]::IsPathRooted($OutputPath)) {
   $OutputPath
 } else {
-  Join-Path (Get-Location) $OutputPath
+  Join-Path $RepoRoot $OutputPath
 }
 
 $outputDirectory = Split-Path -Parent $output
