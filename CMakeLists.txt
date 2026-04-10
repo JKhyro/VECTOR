@@ -32,6 +32,11 @@ target_link_libraries(vector_child_program_runtime_tests
     vector_child_program_runtime
 )
 
+target_compile_definitions(vector_child_program_runtime_tests
+  PRIVATE
+    VECTOR_TEST_FIXTURE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures"
+)
+
 if(MSVC)
   target_compile_options(vector_child_program_runtime_tests PRIVATE /W4)
 else()
