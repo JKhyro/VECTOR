@@ -1,0 +1,183 @@
+﻿{
+    "generatedAt":  "2026-04-10T13:31:06.000Z",
+    "upstream":  {
+                     "repository":  "https://github.com/openai/codex",
+                     "localPath":  "provided-by-OpenAiCodexRoot-or-OPENAI_CODEX_ROOT",
+                     "branch":  "main",
+                     "commit":  "5bbfee69b6e7fbd519b7aa1d344304e26a647092"
+                 },
+    "vector":  {
+                   "repository":  "https://github.com/JKhyro/VECTOR",
+                   "targetRuntime":  "Native C",
+                   "desktopHost":  "Avalonia",
+                   "persistence":  "Postgres plus pgvector via DEVBASE; upstream SQLite-shaped persistence is import/reference only",
+                   "firstClassPrograms":  [
+                                              "vector-main-program",
+                                              "vector-left-menu-program",
+                                              "vector-main-interaction-program"
+                                          ]
+               },
+    "components":  [
+                       {
+                           "upstreamPath":  "codex-rs/core",
+                           "exists":  true,
+                           "vectorProgram":  "vector-session-runtime-program",
+                           "assimilation":  "translate",
+                           "priority":  1
+                       },
+                       {
+                           "upstreamPath":  "codex-rs/app-server",
+                           "exists":  true,
+                           "vectorProgram":  "vector-main-program",
+                           "assimilation":  "translate",
+                           "priority":  1
+                       },
+                       {
+                           "upstreamPath":  "codex-rs/app-server-protocol",
+                           "exists":  true,
+                           "vectorProgram":  "native-abi-and-avalonia-interop",
+                           "assimilation":  "copy-contracts",
+                           "priority":  1
+                       },
+                       {
+                           "upstreamPath":  "codex-rs/app-server-client",
+                           "exists":  true,
+                           "vectorProgram":  "avalonia-host-interop",
+                           "assimilation":  "translate-thin-client",
+                           "priority":  2
+                       },
+                       {
+                           "upstreamPath":  "codex-rs/tui",
+                           "exists":  true,
+                           "vectorProgram":  "vector-main-interaction-program",
+                           "assimilation":  "copy-behavior-not-ui",
+                           "priority":  1
+                       },
+                       {
+                           "upstreamPath":  "codex-rs/cli",
+                           "exists":  true,
+                           "vectorProgram":  "vector-command-launch",
+                           "assimilation":  "translate",
+                           "priority":  2
+                       },
+                       {
+                           "upstreamPath":  "codex-rs/exec",
+                           "exists":  true,
+                           "vectorProgram":  "vector-tool-execution-program",
+                           "assimilation":  "translate",
+                           "priority":  1
+                       },
+                       {
+                           "upstreamPath":  "codex-rs/protocol",
+                           "exists":  true,
+                           "vectorProgram":  "vector-shared-protocol",
+                           "assimilation":  "copy-contracts",
+                           "priority":  1
+                       },
+                       {
+                           "upstreamPath":  "codex-rs/apply-patch",
+                           "exists":  true,
+                           "vectorProgram":  "vector-artifact-program",
+                           "assimilation":  "translate",
+                           "priority":  1
+                       },
+                       {
+                           "upstreamPath":  "codex-rs/git-utils",
+                           "exists":  true,
+                           "vectorProgram":  "fluxbase-anvil-integration",
+                           "assimilation":  "reference-and-translate",
+                           "priority":  2
+                       },
+                       {
+                           "upstreamPath":  "codex-rs/file-search",
+                           "exists":  true,
+                           "vectorProgram":  "vector-tool-execution-program",
+                           "assimilation":  "translate",
+                           "priority":  2
+                       },
+                       {
+                           "upstreamPath":  "codex-rs/sandboxing",
+                           "exists":  true,
+                           "vectorProgram":  "vector-sandbox-program",
+                           "assimilation":  "translate-policy",
+                           "priority":  2
+                       },
+                       {
+                           "upstreamPath":  "codex-rs/windows-sandbox-rs",
+                           "exists":  true,
+                           "vectorProgram":  "vector-sandbox-program",
+                           "assimilation":  "translate-policy",
+                           "priority":  2
+                       },
+                       {
+                           "upstreamPath":  "codex-rs/linux-sandbox",
+                           "exists":  true,
+                           "vectorProgram":  "vector-sandbox-program",
+                           "assimilation":  "translate-policy",
+                           "priority":  2
+                       },
+                       {
+                           "upstreamPath":  "codex-rs/config",
+                           "exists":  true,
+                           "vectorProgram":  "vector-settings-contract",
+                           "assimilation":  "translate",
+                           "priority":  2
+                       },
+                       {
+                           "upstreamPath":  "codex-rs/state",
+                           "exists":  true,
+                           "vectorProgram":  "devbase-backed-vector-state",
+                           "assimilation":  "replace-persistence",
+                           "priority":  1
+                       },
+                       {
+                           "upstreamPath":  "codex-rs/login",
+                           "exists":  true,
+                           "vectorProgram":  "vector-auth-boundary",
+                           "assimilation":  "translate",
+                           "priority":  3
+                       },
+                       {
+                           "upstreamPath":  "codex-rs/chatgpt",
+                           "exists":  true,
+                           "vectorProgram":  "vector-model-provider-boundary",
+                           "assimilation":  "translate",
+                           "priority":  3
+                       },
+                       {
+                           "upstreamPath":  "codex-rs/codex-client",
+                           "exists":  true,
+                           "vectorProgram":  "vector-model-provider-boundary",
+                           "assimilation":  "translate",
+                           "priority":  3
+                       },
+                       {
+                           "upstreamPath":  "codex-rs/mcp-server",
+                           "exists":  true,
+                           "vectorProgram":  "vector-connector-program",
+                           "assimilation":  "optional-integration",
+                           "priority":  3
+                       },
+                       {
+                           "upstreamPath":  "codex-rs/rmcp-client",
+                           "exists":  true,
+                           "vectorProgram":  "vector-connector-program",
+                           "assimilation":  "optional-integration",
+                           "priority":  3
+                       },
+                       {
+                           "upstreamPath":  "codex-cli",
+                           "exists":  true,
+                           "vectorProgram":  "reference-only",
+                           "assimilation":  "legacy-reference",
+                           "priority":  4
+                       },
+                       {
+                           "upstreamPath":  "docs",
+                           "exists":  true,
+                           "vectorProgram":  "vector-operator-docs",
+                           "assimilation":  "copy-useful-docs",
+                           "priority":  2
+                       }
+                   ]
+}
