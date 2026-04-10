@@ -5,6 +5,7 @@ project(VECTOR VERSION 0.1.0 LANGUAGES C)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
+include(GNUInstallDirs)
 
 add_library(vector_child_program_runtime STATIC
   src/child_program_runtime.c
@@ -80,3 +81,11 @@ add_test(NAME vector_host_assign_audit_only_fails
     tool-execution apply-patch)
 set_tests_properties(vector_host_assign_audit_only_fails
   PROPERTIES WILL_FAIL TRUE)
+
+install(TARGETS vector_child_program_runtime vector_host
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+install(FILES include/vector/child_program_runtime.h
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/vector)
