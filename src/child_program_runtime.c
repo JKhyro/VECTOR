@@ -282,6 +282,54 @@ vector_child_program_status vector_child_program_assign_helper(
   return out_assignment->status;
 }
 
+vector_child_program_status vector_child_program_assign_cortex_export(
+  const vector_cortex_export_assignment_request *request,
+  vector_helper_assignment *out_assignment
+) {
+  vector_helper_assignment_request assignment_request;
+
+  if (out_assignment == NULL) {
+    return VECTOR_CHILD_PROGRAM_STATUS_NULL_ARGUMENT;
+  }
+
+  reset_assignment(out_assignment);
+
+  if (request == NULL) {
+    out_assignment->status = VECTOR_CHILD_PROGRAM_STATUS_NULL_ARGUMENT;
+    out_assignment->status_message = "null argument";
+    return out_assignment->status;
+  }
+
+  if (request->abi_version != VECTOR_CHILD_PROGRAM_RUNTIME_ABI_VERSION) {
+    out_assignment->status = VECTOR_CHILD_PROGRAM_STATUS_UNSUPPORTED_ABI;
+    out_assignment->status_message = "unsupported ABI version";
+    return out_assignment->status;
+  }
+
+  if (
+    request->runtime_export.character_ready == 0u ||
+    request->runtime_export.component_ready == 0u ||
+    request->runtime_export.helper_can_bind == 0u
+  ) {
+    out_assignment->status =
+      VECTOR_CHILD_PROGRAM_STATUS_CORTEX_EXPORT_NOT_READY;
+    out_assignment->cortex = request->runtime_export.cortex;
+    out_assignment->helper = request->runtime_export.helper;
+    out_assignment->status_message =
+      "CORTEX runtime export is not ready for VECTOR helper assignment";
+    return out_assignment->status;
+  }
+
+  memset(&assignment_request, 0, sizeof(assignment_request));
+  assignment_request.abi_version = request->abi_version;
+  assignment_request.region = request->region;
+  assignment_request.operation_id = request->operation_id;
+  assignment_request.cortex = request->runtime_export.cortex;
+  assignment_request.helper = request->runtime_export.helper;
+
+  return vector_child_program_assign_helper(&assignment_request, out_assignment);
+}
+
 const char *vector_child_program_status_name(vector_child_program_status status) {
   switch (status) {
     case VECTOR_CHILD_PROGRAM_STATUS_OK:
@@ -298,6 +346,8 @@ const char *vector_child_program_status_name(vector_child_program_status status)
       return "helper_assignment_not_allowed";
     case VECTOR_CHILD_PROGRAM_STATUS_MISSING_HELPER_REFERENCE:
       return "missing_helper_reference";
+    case VECTOR_CHILD_PROGRAM_STATUS_CORTEX_EXPORT_NOT_READY:
+      return "cortex_export_not_ready";
     default:
       return "unknown_status";
   }

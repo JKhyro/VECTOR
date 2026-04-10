@@ -53,7 +53,7 @@ The first concrete topology slice lives in [`docs/vector-runtime-topology-first-
 
 The first bounded main-program decomposition lives in [`docs/vector-main-child-program-first-slice.md`](docs/vector-main-child-program-first-slice.md).
 
-The first Native C child-program ABI lives in [`include/vector/child_program_runtime.h`](include/vector/child_program_runtime.h). It exposes ABI/schema versions, first-class child-program descriptors, workspace-region routing, imported helper assignment, stable status names, and CORTEX character/component reference fields for main interaction, session runtime, tool execution, approval review, artifact, and status/activity programs.
+The first Native C child-program ABI lives in [`include/vector/child_program_runtime.h`](include/vector/child_program_runtime.h). It exposes ABI/schema versions, first-class child-program descriptors, workspace-region routing, imported helper assignment, CORTEX runtime export assignment, stable status names, and CORTEX character/component reference fields for main interaction, session runtime, tool execution, approval review, artifact, and status/activity programs.
 
 The first upstream Codex component assimilation map lives in [`docs/openai-codex-component-assimilation-map.md`](docs/openai-codex-component-assimilation-map.md), with a generated local upstream manifest at [`docs/openai-codex-upstream-manifest.json`](docs/openai-codex-upstream-manifest.json).
 
