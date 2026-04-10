@@ -29,6 +29,7 @@ It is intentionally bounded. It does not describe every future subsystem. It def
 - Candidate follow-on child programs are `vector-context-inspector-program`, `vector-approval-review-program`, `vector-artifact-inspector-program`, and `vector-status-activity-rail-program`.
 - Avalonia hosts those regions, but the Native C runtime remains the authority for the child-program contract and switching rule.
 - The current host seam now renders dedicated left-menu and main-interaction regions from that runtime contract instead of treating the split as an implicit operator convention.
+- The first upstream Codex assimilation map now assigns the cloned `openai/codex` components to these VECTOR child programs so the clone can be copied, translated, or kept as reference by component instead of remaining an unstructured source dump.
 
 ## Child-program ownership
 

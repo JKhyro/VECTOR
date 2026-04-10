@@ -29,6 +29,7 @@ VECTOR consumes CORTEX-managed characters and agent components and exposes them 
 
 - current CODEX continuity still lives in the Codex Workbench line while VECTOR product direction is made explicit
 - useful upstream `openai/codex` behavior, contracts, and UX can be assimilated aggressively
+- upstream `openai/codex` assimilation is now tracked as a concrete component map rather than a vague reference; the first map ties upstream crates and folders to VECTOR child programs
 - upstream SQLite-shaped persistence is import/reference only where VECTOR now has a governed `DEVBASE` path
 - VCS truth belongs in `FLUXBASE`, code-development truth belongs in `CODEBASE`, and communications belong in `CHATBASE`
 - ANVIL replacement-oriented local-git and GitHub execution truth still belongs in `FLUXBASE` and the corresponding repo/project/issue/PR/discussion surfaces rather than in `DEVBASE`
@@ -52,6 +53,16 @@ The first concrete topology slice lives in [`docs/vector-runtime-topology-first-
 
 The first bounded main-program decomposition lives in [`docs/vector-main-child-program-first-slice.md`](docs/vector-main-child-program-first-slice.md).
 
+The first upstream Codex component assimilation map lives in [`docs/openai-codex-component-assimilation-map.md`](docs/openai-codex-component-assimilation-map.md), with a generated local upstream manifest at [`docs/openai-codex-upstream-manifest.json`](docs/openai-codex-upstream-manifest.json).
+
 The explicit CORTEX-to-VECTOR execution boundary now lives in [`docs/vector-character-consumer-boundary.md`](docs/vector-character-consumer-boundary.md).
+
+## Upstream Manifest
+
+Regenerate the local OpenAI Codex component manifest from the cloned source with:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tools\write-codex-upstream-manifest.ps1
+```
 
 GitHub Discussions are currently disabled for this repository, so execution truth for now lives in the repo README, issues, and the VECTOR project.
