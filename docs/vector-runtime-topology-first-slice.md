@@ -76,6 +76,8 @@ It is intentionally bounded. It does not describe every future subsystem. It def
 - Current CODEX continuity work may still expose bounded seams through the Codex Workbench line.
 - Those seams should keep reporting `FLUXBASE`, `DEVBASE`, `CODEBASE`, and `CHATBASE` explicitly rather than collapsing state back into one local app store.
 - Upstream `openai/codex` session and retrieval behavior can still be assimilated, but the authoritative lane for forward VECTOR memory remains `DEVBASE`, not SQLite.
+- The first native C runtime slice now exposes workspace-region routing through `vector_child_program_route_region`, so the Avalonia host can ask the native runtime for the governing child-program descriptor before rendering left-menu or main-interaction regions.
+- The main-interaction route requires CORTEX character and component references, preserving CORTEX ownership of character/component identity while letting VECTOR consume that state for workspace execution.
 
 ## Completed next slice
 
