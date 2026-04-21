@@ -10,6 +10,13 @@ VECTOR consumes CORTEX-managed characters and agent components and exposes them 
 - `VECTOR` owns workspace-facing execution, task interaction, file and tool surfaces, and the runtime contract that lets managed characters do useful work.
 - `SYMBIOSIS` routes harvested OpenClaw, Lobster, and Hermes behavior here when the capability is fundamentally workspace-facing rather than character-defining.
 
+## Runtime base: Hermes-derived FURYOKU
+
+The live agent runtime that VECTOR exposes through its workspace-facing execution surface has moved from OpenClaw to Hermes Agent. Hermes-derived FURYOKU is the runtime spine for the 7-Symbiote swarm whose characters VECTOR consumes; OpenClaw is demoted to a feature-harvest lane — selectively mined for workspace-facing capability per the `SYMBIOSIS` routing rule above, but not promoted to host. VECTOR's workspace boundary (Native C + Avalonia interop + DEVBASE/CODEBASE/CHATBASE data plane) is unchanged; only the runtime executing the managed characters has shifted. Anchor is universalized across `JKhyro` Project #20 (FURYOKU) and Project #10 (SYMBIOSIS).
+
+- Authoritative migration plan: [`FURYOKU/docs/hermes-furyoku-migration.md`](https://github.com/JKhyro/FURYOKU/blob/main/docs/hermes-furyoku-migration.md)
+- OpenClaw carryover rules: [`FURYOKU/docs/openclaw-carryover-inventory.md`](https://github.com/JKhyro/FURYOKU/blob/main/docs/openclaw-carryover-inventory.md)
+
 ## Implementation direction
 
 - Native C is the primary runtime ownership lane.
